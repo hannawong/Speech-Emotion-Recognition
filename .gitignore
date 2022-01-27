@@ -1,0 +1,8 @@
+*.swap
+.nfs*
+cache/
+output/
+wandb/
+venv/
+__pycache__/
+paper_slides/
