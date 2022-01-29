@@ -5,12 +5,13 @@ from transformers import BertPreTrainedModel, BertModel, BertTokenizerFast
 from transformers import RobertaTokenizerFast, RobertaPreTrainedModel,RobertaModel
 
 class ColBERT(RobertaPreTrainedModel):
-    def __init__(self, config, query_maxlen,  mask_punctuation, dim=128):
+    def __init__(self, config, query_maxlen,  mask_punctuation, num_labels=2,dim=128):
 
         super(ColBERT, self).__init__(config)
         self.config = config
         self.query_maxlen = query_maxlen
         self.dim = dim
+        self.num_labels = num_labels
 
         self.mask_punctuation = mask_punctuation
         self.skiplist = {}
@@ -33,6 +34,9 @@ class ColBERT(RobertaPreTrainedModel):
         self.decoder.bias = self.bias
 
         #########  for SER classification task   ##########
+        self.dense1 = nn.Linear(config.hidden_size, config.hidden_size)
+        self.dropout = nn.Dropout(0.1)
+        self.out_proj = nn.Linear(config.hidden_size, num_labels)
          
 
         self.init_weights()
@@ -48,7 +52,7 @@ class ColBERT(RobertaPreTrainedModel):
         if mode == "mlm": 
             return self.mlm_score(Q,label)
         if mode == "ser": ##classification head
-            pass
+            return self.classification_score(Q,label)
 
 
 
@@ -68,3 +72,18 @@ class ColBERT(RobertaPreTrainedModel):
         label = label.cuda()
         masked_lm_loss = loss_fct(prediction_scores.view(-1, self.config.vocab_size), label.view(-1))
         return masked_lm_loss
+
+    def classification_score(self,Q,label):
+        sentence = Q[0].cuda()
+        sentence_mask = Q[1].cuda()
+        label = label.cuda()
+        output = self.roberta(sentence,attention_mask = sentence_mask)
+        sequence_output = output[0][:,0,:]
+        x = self.dropout(sequence_output)
+        x = self.dense1(x)
+        x = torch.tanh(x)
+        x = self.dropout(x)
+        x = self.out_proj(x)
+        loss_fct = torch.nn.CrossEntropyLoss()
+        loss = loss_fct(x.view(-1, self.num_labels), label.view(-1))
+        return loss

@@ -6,3 +6,5 @@ wandb/
 venv/
 __pycache__/
 paper_slides/
+logs/
+MSMARCO-psg/
