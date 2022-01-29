@@ -1,6 +1,6 @@
 
 from functools import partial
-from colXLM.modeling.tokenization import QueryTokenizer, tensorize_triples
+from Roberta.modeling.tokenization import QueryTokenizer, tensorize_triples
 
 
 class PretrainBatcher():

@@ -1,7 +1,7 @@
 import torch
 
 from contextlib import contextmanager
-from colXLM.utils.utils import NullContextManager
+from Roberta.utils.utils import NullContextManager
 
 PyTorch_over_1_6 = float('.'.join(torch.__version__.split('.')[0:2])) >= 1.6
 

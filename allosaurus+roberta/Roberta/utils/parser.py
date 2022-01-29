@@ -4,9 +4,9 @@ import faiss
 
 from argparse import ArgumentParser
 
-import colXLM.utils.distributed as distributed
-from colXLM.utils.runs import Run
-from colXLM.utils.utils import print_message
+import Roberta.utils.distributed as distributed
+from Roberta.utils.runs import Run
+from Roberta.utils.utils import print_message
 
 
 class Arguments():

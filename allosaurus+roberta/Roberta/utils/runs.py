@@ -4,11 +4,11 @@ import time
 import __main__
 import mlflow
 
-import colXLM.utils.distributed as distributed
+import Roberta.utils.distributed as distributed
 
 from contextlib import contextmanager
-from colXLM.utils.logging import Logger
-from colXLM.utils.utils import timestamp, create_directory, print_message
+from Roberta.utils.logging import Logger
+from Roberta.utils.utils import timestamp, create_directory, print_message
 
 
 class _RunManager():

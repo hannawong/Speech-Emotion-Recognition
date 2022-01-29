@@ -1,9 +1,9 @@
 import os
 import torch
 import random
-from colXLM.utils.runs import Run
-from colXLM.utils.utils import save_checkpoint
-from colXLM.parameters import SAVED_CHECKPOINTS
+from Roberta.utils.runs import Run
+from Roberta.utils.utils import save_checkpoint
+from Roberta.parameters import SAVED_CHECKPOINTS
 
 
 def print_progress(scores):

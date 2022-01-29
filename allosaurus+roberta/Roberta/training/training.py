@@ -3,12 +3,12 @@ import torch
 import numpy as np
 from transformers import AdamW
 
-from colXLM.utils.amp import MixedPrecisionManager
-from colXLM.training.pretrainbatcher import PretrainBatcher
-from colXLM.parameters import DEVICE
-from colXLM.modeling.colbert import ColBERT
-from colXLM.utils.utils import print_message
-from colXLM.training.utils import get_mask, manage_checkpoints
+from Roberta.utils.amp import MixedPrecisionManager
+from Roberta.training.pretrainbatcher import PretrainBatcher
+from Roberta.parameters import DEVICE
+from Roberta.modeling.colbert import ColBERT
+from Roberta.utils.utils import print_message
+from Roberta.training.utils import get_mask, manage_checkpoints
 
 
 def train(args):

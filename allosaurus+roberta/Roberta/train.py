@@ -1,6 +1,6 @@
-from colXLM.utils.parser import Arguments
-from colXLM.utils.runs import Run
-from colXLM.training.training import train
+from Roberta.utils.parser import Arguments
+from Roberta.utils.runs import Run
+from Roberta.training.training import train
 
 
 def main():

@@ -1,5 +1,5 @@
 from transformers import BertTokenizerFast,RobertaTokenizerFast
-from colXLM.modeling.tokenization.utils import _split_into_batches
+from Roberta.modeling.tokenization.utils import _split_into_batches
 
 
 class QueryTokenizer():
