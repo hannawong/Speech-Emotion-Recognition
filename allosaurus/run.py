@@ -6,6 +6,7 @@ import pickle
 import argparse
 
 TRAIN_PATH = "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/train.csv"
+ALLO_EMB_PATH = "/data/jiayu_xiao/IEMOCAP/allo_embedding/"
 
 def get_allosaurus_embedding(input):
     # input file/path
@@ -60,5 +61,5 @@ if __name__ == '__main__':
         line = line.split(",")
         file_name = line[0]
         allo_emb = get_allosaurus_embedding(file_name)  ##(1,65,230)
-        output = open('/data/jiayu_xiao/IEMOCAP/allo_embedding/'+file_name.split("/")[-1]+'.pkl', 'wb')
+        output = open(ALLO_EMB_PATH+file_name.split("/")[-1]+'.pkl', 'wb')
         pickle.dump(allo_emb, output)
