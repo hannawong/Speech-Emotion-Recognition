@@ -4,7 +4,11 @@
 
 #### 1. Allosaurus Features
 The `run.py` file in the original Allosaurus project is modified in order to extract the feature embedding just before the softmax layer. In order to get the Allosaurus embedding for your wav files, please change the `TRAIN_PATH` in `run.py` as the csv files containing all the training samples, and change `ALLO_EMB_PATH` to the directory in which you want to store the feature pkl.
-
+Then simply run
+```sh
+python -m allosaurus.run
+```
+to extract allosaurus features. 
 
 ### Train the Model
 
