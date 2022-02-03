@@ -5,7 +5,7 @@ from pathlib import Path
 import pickle
 import argparse
 
-TRAIN_PATH = "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/_iemocap_01F.train.csv"
+TRAIN_PATH = "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/train.csv"
 
 def get_allosaurus_embedding(input):
     # input file/path

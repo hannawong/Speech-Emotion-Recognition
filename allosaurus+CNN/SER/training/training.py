@@ -10,7 +10,7 @@ from SER.modeling.ser_model import SER_MODEL
 from SER.utils.utils import print_message
 from SER.training.utils import manage_checkpoints
 
-
+LOG = open("log.txt",'w')
 def train(args):
 
     random.seed(12345)
@@ -29,7 +29,7 @@ def train(args):
     if args.rank not in [-1, 0]:
         torch.distributed.barrier()
 
-    ser_model = SER_MODEL(audio_maxlen=128,dim=128)
+    ser_model = SER_MODEL(audio_maxlen=100,dim=128)
 
     if args.checkpoint is not None:
         assert args.resume_optimizer is False
@@ -70,18 +70,16 @@ def train(args):
 
         for batch_idx, BatchSteps in zip(range(start_batch_idx,args.maxsteps), reader):
             for feat_emb, labels in BatchSteps:    
-                feat_emb = torch.Tensor(feat_emb).cuda()
-                labels = torch.Tensor(labels).cuda()
-                print(feat_emb.shape,labels.shape)
+                feat_emb = torch.Tensor(feat_emb).cuda() ##[32,100,230]
+                labels = torch.Tensor(labels).cuda() ##[32]
                 with amp.context():
-                    #queries_mlm,labels_mlm = get_mask(queries,args,reader)
                     loss = ser_model(feat_emb,labels)
-                    print(loss)
                     amp.backward(loss)
                     train_loss += loss.item()
 
                 avg_loss = train_loss / (batch_idx+1)
-                print_message(step, avg_loss)
+                msg = print_message(step, avg_loss)
+                LOG.write(msg+"\n")
                 amp.step(ser_model, optimizer)
                 step += 1
                 

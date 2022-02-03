@@ -19,7 +19,6 @@ class SER_MODEL(nn.Module):
         return self.classification_score(feat_emb, label)
 
     def classification_score(self,feat_emb,label):
-
         x = torch.sum(feat_emb,axis = 1)
         x = self.dense1(x)
         x = torch.tanh(x)

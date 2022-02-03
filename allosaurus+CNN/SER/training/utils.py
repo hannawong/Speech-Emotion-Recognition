@@ -45,7 +45,7 @@ def tensorize_triples(audio_files, labels, bsize): ##transform sentence into ids
     allo_embs = []
     for file in audio_files:
         allo_emb = pkl.load(open("/data/jiayu_xiao/IEMOCAP/allo_embedding/"+file.split("/")[-1]+".pkl","rb"))
-        if allo_emb.shape[1] >= 100:
+        if allo_emb.shape[1] >= MAX_LEN:
             allo_emb = allo_emb[0,:MAX_LEN,:]
         else:
             zero = torch.zeros((MAX_LEN-allo_emb.shape[1], allo_emb.shape[2]))
