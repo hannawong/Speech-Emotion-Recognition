@@ -91,7 +91,7 @@ def train(args):
 
             
     step = 0
-    for epoch in range(20):
+    for epoch in range(40):
         training(step)
         eval(args,ser_model)
         manage_checkpoints(args, ser_model, optimizer, step+1)
