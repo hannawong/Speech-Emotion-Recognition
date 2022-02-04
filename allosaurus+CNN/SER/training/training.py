@@ -56,7 +56,7 @@ def train(args):
 
 
     amp = MixedPrecisionManager(args.amp)
-    optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()))
+    optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()),lr = 0.005)
 
     def training(step):
         reader = PretrainBatcher(args, args.triples,(0 if args.rank == -1 else args.rank), args.nranks)
@@ -77,7 +77,7 @@ def train(args):
                 feat_emb = torch.Tensor(feat_emb).cuda() ##[32,100,230]
                 labels = torch.Tensor(labels).cuda() ##[32]
                 with amp.context():
-                    loss = ser_model(feat_emb,labels)
+                    loss,_ = ser_model(feat_emb,labels)
                     amp.backward(loss)
                     print(loss)
                     train_loss += loss.item()
@@ -93,4 +93,27 @@ def train(args):
     step = 0
     for epoch in range(20):
         training(step)
+        eval(args,ser_model)
         manage_checkpoints(args, ser_model, optimizer, step+1)
+
+from sklearn.metrics import accuracy_score
+def eval(args,model):
+    reader = PretrainBatcher(args, "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/_iemocap_01F.test.csv",(0 if args.rank == -1 else args.rank), args.nranks)
+    train_loss = 0.0
+    start_batch_idx = 0
+
+    i = 0
+    tot_acc = 0
+    with torch.no_grad():
+        for batch_idx, BatchSteps in zip(range(start_batch_idx,args.maxsteps), reader):
+            for feat_emb, labels in BatchSteps: 
+                i += 1 
+                feat_emb = torch.Tensor(feat_emb).cuda() ##[32,100,230]
+                labels = torch.Tensor(labels).cuda() ##[32]
+                loss, output = model(feat_emb,labels)
+                pred_label = torch.argmax(output,dim = 1)
+                acc = accuracy_score(pred_label.cpu().detach(),labels.cpu().detach())
+                tot_acc += acc
+    LOG.write("test accuracy"+str(tot_acc/i)+"\n")
+    print("test accuracy"+str(tot_acc/i)+"\n")
+    sleep(1)
