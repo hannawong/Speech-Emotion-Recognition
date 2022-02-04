@@ -1,4 +1,5 @@
 import random
+from time import sleep
 import torch
 import numpy as np
 from transformers import AdamW
@@ -11,11 +12,14 @@ from SER.utils.utils import print_message
 from SER.training.utils import manage_checkpoints
 
 LOG = open("log.txt",'w')
+
+
 def train(args):
 
     random.seed(12345)
     np.random.seed(12345)
     torch.manual_seed(12345)
+    ser_model = SER_MODEL(audio_maxlen=100)
 
     if args.distributed:
         torch.cuda.manual_seed_all(12345)
@@ -28,8 +32,6 @@ def train(args):
     
     if args.rank not in [-1, 0]:
         torch.distributed.barrier()
-
-    ser_model = SER_MODEL(audio_maxlen=100,dim=128)
 
     if args.checkpoint is not None:
         assert args.resume_optimizer is False
@@ -60,7 +62,6 @@ def train(args):
         reader = PretrainBatcher(args, args.triples,(0 if args.rank == -1 else args.rank), args.nranks)
         train_loss = 0.0
         start_batch_idx = 0
-        optimizer.zero_grad()
 
         if args.resume:
             assert args.checkpoint is not None
@@ -68,13 +69,17 @@ def train(args):
 
             reader.skip_to_batch(start_batch_idx, checkpoint['arguments']['bsize'])
 
+        i = 0
         for batch_idx, BatchSteps in zip(range(start_batch_idx,args.maxsteps), reader):
-            for feat_emb, labels in BatchSteps:    
+            for feat_emb, labels in BatchSteps: 
+                i += 1 
+                optimizer.zero_grad()
                 feat_emb = torch.Tensor(feat_emb).cuda() ##[32,100,230]
                 labels = torch.Tensor(labels).cuda() ##[32]
                 with amp.context():
                     loss = ser_model(feat_emb,labels)
                     amp.backward(loss)
+                    print(loss)
                     train_loss += loss.item()
 
                 avg_loss = train_loss / (batch_idx+1)
@@ -82,9 +87,10 @@ def train(args):
                 LOG.write(msg+"\n")
                 amp.step(ser_model, optimizer)
                 step += 1
-                
+        LOG.write(str(train_loss/i)+"\n")
 
+            
     step = 0
-    for epoch in range(10):
+    for epoch in range(20):
         training(step)
         manage_checkpoints(args, ser_model, optimizer, step+1)
