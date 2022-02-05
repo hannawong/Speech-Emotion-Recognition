@@ -11,8 +11,8 @@ from SER.modeling.ser_model import SER_MODEL
 from SER.utils.utils import print_message
 from SER.training.utils import manage_checkpoints
 
-LOG = open("log.txt",'w')
-
+LOG = open("log_.txt",'w')
+CLASS_NUM = 4
 
 def train(args):
 
@@ -56,7 +56,7 @@ def train(args):
 
 
     amp = MixedPrecisionManager(args.amp)
-    optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()),lr = 0.005)
+    optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()),lr = 0.005,weight_decay=1e-5)
 
     def training(step):
         reader = PretrainBatcher(args, args.triples,(0 if args.rank == -1 else args.rank), args.nranks)
@@ -91,7 +91,9 @@ def train(args):
 
             
     step = 0
-    for epoch in range(40):
+    for epoch in range(80):
+        print("="*30+"epoch: "+str(epoch)+"="*30+">")
+        LOG.write("="*30+"epoch: "+str(epoch)+"="*30+">"+"\n")
         training(step)
         eval(args,ser_model)
         manage_checkpoints(args, ser_model, optimizer, step+1)
@@ -99,9 +101,9 @@ def train(args):
 from sklearn.metrics import accuracy_score
 def eval(args,model):
     reader = PretrainBatcher(args, "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/_iemocap_01F.test.csv",(0 if args.rank == -1 else args.rank), args.nranks)
-    train_loss = 0.0
     start_batch_idx = 0
-
+    class_tot = [0]*CLASS_NUM 
+    class_correct = [0]*CLASS_NUM
     i = 0
     tot_acc = 0
     with torch.no_grad():
@@ -114,6 +116,23 @@ def eval(args,model):
                 pred_label = torch.argmax(output,dim = 1)
                 acc = accuracy_score(pred_label.cpu().detach(),labels.cpu().detach())
                 tot_acc += acc
-    LOG.write("test accuracy"+str(tot_acc/i)+"\n")
-    print("test accuracy"+str(tot_acc/i)+"\n")
+                ####### compute unweighted accuracy  ########
+                pred_label = pred_label.cpu().detach().numpy()
+                labels = labels.cpu().detach().numpy()
+                print(pred_label.shape)
+                for j in range(len(pred_label)):
+                        class_tot[int(labels[j])] += 1
+                        if int(pred_label[j]) == int(labels[j]):
+                            class_correct[int(labels[j])] += 1
+    print(class_correct,class_tot)
+    unweight_acc = []
+    for j in range(CLASS_NUM):
+        unweight_acc.append(class_correct[j]/class_tot[j])
+    
+    LOG.write("unweighted test accuracy"+str(sum(unweight_acc)/4)+"\n")
+    print(class_correct,class_tot)
+    print(unweight_acc)
+    print("UA= ",sum(unweight_acc)/4)              
+    LOG.write("weighted test accuracy"+str(tot_acc/i)+"\n")
+    print("weighted test accuracy"+str(tot_acc/i)+"\n")
     sleep(1)
