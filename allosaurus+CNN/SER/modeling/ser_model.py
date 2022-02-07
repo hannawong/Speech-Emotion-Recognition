@@ -10,7 +10,7 @@ class SER_MODEL(nn.Module):
         self.num_labels = num_labels
 
         #########  for SER classification task   ##########
-        self.lstm = nn.LSTM(230, 230, 2, bidirectional=True)
+        self.lstm = nn.LSTM(230, 230, 1, bidirectional=True)
         self.dense1 = nn.Linear(460, hidden_size*4)
         self.bn = torch.nn.BatchNorm1d(hidden_size*4)
         self.dropout = nn.Dropout(0.1)

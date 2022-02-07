@@ -13,7 +13,7 @@ def main():
     args = parser.parse()
 
     with Run.context(consider_failed_if_interrupted=False):
-        train(args)
+        model = train(args)
 
 
 if __name__ == "__main__":

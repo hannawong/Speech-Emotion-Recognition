@@ -1,6 +1,6 @@
 CUDA_VISIBLE_DEVICES="0" \
 python -m \
-SER.train --bsize 256 --accum 1 \
---triples /data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/_iemocap_01F.train.csv \
+SER.train --bsize 512 --accum 1 \
+--triples /data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/_iemocap_03M.train.csv \
 --langs "en" \
 --root /data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN --experiment MSMARCO-psg --run msmarco.psg.rronly --maxsteps 20000

@@ -13,6 +13,8 @@ from SER.training.utils import manage_checkpoints
 
 LOG = open("log_.txt",'w')
 CLASS_NUM = 4
+TEST_PATH = "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/_iemocap_03M.test.csv"
+VAL_PATH = "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/_iemocap_03M.val.csv"
 
 def train(args):
 
@@ -20,6 +22,10 @@ def train(args):
     np.random.seed(12345)
     torch.manual_seed(12345)
     ser_model = SER_MODEL(audio_maxlen=100)
+
+    best_model = None
+    best_uacc = 0.0
+    best_wacc = 0.0
 
     if args.distributed:
         torch.cuda.manual_seed_all(12345)
@@ -47,7 +53,6 @@ def train(args):
         torch.distributed.barrier()
 
     ser_model = ser_model.to(DEVICE)
-    ser_model.train()
 
     if args.distributed:
         ser_model = torch.nn.parallel.DistributedDataParallel(ser_model, device_ids=[args.rank],
@@ -59,6 +64,7 @@ def train(args):
     optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()),lr = 0.005,weight_decay=1e-5)
 
     def training(step):
+        ser_model.train()
         reader = PretrainBatcher(args, args.triples,(0 if args.rank == -1 else args.rank), args.nranks)
         train_loss = 0.0
         start_batch_idx = 0
@@ -84,28 +90,39 @@ def train(args):
 
                 avg_loss = train_loss / (batch_idx+1)
                 msg = print_message(step, avg_loss)
-                LOG.write(msg+"\n")
                 amp.step(ser_model, optimizer)
                 step += 1
-        LOG.write(str(train_loss/i)+"\n")
+        LOG.write("loss: "+str(train_loss/i)+"\n")
 
             
     step = 0
-    for epoch in range(80):
+    for epoch in range(60):
         print("="*30+"epoch: "+str(epoch)+"="*30+">")
         LOG.write("="*30+"epoch: "+str(epoch)+"="*30+">"+"\n")
         training(step)
-        eval(args,ser_model)
-        manage_checkpoints(args, ser_model, optimizer, step+1)
+        uacc,wacc = evaluate(args,ser_model,TEST_PATH)
+        if not best_model:
+            best_model = ser_model
+        else:
+            if uacc > best_uacc:
+                print("saving best model...")
+                best_uacc = uacc
+                torch.save(ser_model,"checkpoint.dnn")
+        #manage_checkpoints(args, ser_model, optimizer, step+1)
+    
+    print("finish training, now test on testset")
+    best_model = torch.load("checkpoint.dnn")
+    evaluate(args,best_model,TEST_PATH)
 
 from sklearn.metrics import accuracy_score
-def eval(args,model):
-    reader = PretrainBatcher(args, "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/_iemocap_01F.test.csv",(0 if args.rank == -1 else args.rank), args.nranks)
+def evaluate(args,model,path):
+    reader = PretrainBatcher(args, path,(0 if args.rank == -1 else args.rank), args.nranks)
     start_batch_idx = 0
     class_tot = [0]*CLASS_NUM 
     class_correct = [0]*CLASS_NUM
     i = 0
     tot_acc = 0
+
     with torch.no_grad():
         for batch_idx, BatchSteps in zip(range(start_batch_idx,args.maxsteps), reader):
             for feat_emb, labels in BatchSteps: 
@@ -119,20 +136,16 @@ def eval(args,model):
                 ####### compute unweighted accuracy  ########
                 pred_label = pred_label.cpu().detach().numpy()
                 labels = labels.cpu().detach().numpy()
-                print(pred_label.shape)
                 for j in range(len(pred_label)):
                         class_tot[int(labels[j])] += 1
                         if int(pred_label[j]) == int(labels[j]):
                             class_correct[int(labels[j])] += 1
-    print(class_correct,class_tot)
     unweight_acc = []
     for j in range(CLASS_NUM):
         unweight_acc.append(class_correct[j]/class_tot[j])
     
     LOG.write("unweighted test accuracy"+str(sum(unweight_acc)/4)+"\n")
-    print(class_correct,class_tot)
-    print(unweight_acc)
     print("UA= ",sum(unweight_acc)/4)              
     LOG.write("weighted test accuracy"+str(tot_acc/i)+"\n")
     print("weighted test accuracy"+str(tot_acc/i)+"\n")
-    sleep(1)
+    return sum(unweight_acc)/4 , tot_acc/i
