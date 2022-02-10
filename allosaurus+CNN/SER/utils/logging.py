@@ -3,8 +3,6 @@ import sys
 import ujson
 import mlflow
 import traceback
-
-from torch.utils.tensorboard import SummaryWriter
 from SER.utils.utils import print_message, create_directory
 
 

@@ -1,5 +1,4 @@
 from SER.utils.parser import Arguments
-from SER.utils.runs import Run
 from SER.training.training import train
 
 
@@ -12,8 +11,7 @@ def main():
 
     args = parser.parse()
 
-    with Run.context(consider_failed_if_interrupted=False):
-        model = train(args)
+    train(args)
 
 
 if __name__ == "__main__":

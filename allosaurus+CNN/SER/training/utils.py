@@ -8,7 +8,7 @@ from SER.utils.utils import save_checkpoint
 from SER.parameters import SAVED_CHECKPOINTS
 
 MAX_LEN = 100
-ALLO_EMB_PATH = "/data/jiayu_xiao/IEMOCAP/allo_embedding/"
+ALLO_EMB_PATH = "/data1/jiayu_xiao/project/wzh/data/allo_embedding/"
 
 
 def print_progress(scores):

@@ -3,18 +3,17 @@ from time import sleep
 import torch
 import numpy as np
 from transformers import AdamW
-
+from sklearn.metrics import accuracy_score
 from SER.utils.amp import MixedPrecisionManager
 from SER.training.pretrainbatcher import PretrainBatcher
-from SER.parameters import DEVICE
 from SER.modeling.ser_model import SER_MODEL
 from SER.utils.utils import print_message
-from SER.training.utils import manage_checkpoints
 
-LOG = open("log_.txt",'w')
+DEVICE = torch.device("cuda")
+LOG = open("log.txt",'w')
 CLASS_NUM = 4
-TEST_PATH = "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/_iemocap_03M.test.csv"
-VAL_PATH = "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/_iemocap_03M.val.csv"
+TEST_PATH = "/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_05M.test.csv"
+VAL_PATH = "/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_05M.test.csv"
 
 def train(args):
 
@@ -26,54 +25,16 @@ def train(args):
     best_model = None
     best_uacc = 0.0
     best_wacc = 0.0
-
-    if args.distributed:
-        torch.cuda.manual_seed_all(12345)
-        assert args.bsize % args.nranks == 0, (args.bsize, args.nranks)
-        assert args.accumsteps == 1
-        args.bsize = args.bsize // args.nranks
-
-        print("Using args.bsize =", args.bsize, "(per process) and args.accumsteps =", args.accumsteps)
-    
-    
-    if args.rank not in [-1, 0]:
-        torch.distributed.barrier()
-
-    if args.checkpoint is not None:
-        assert args.resume_optimizer is False
-        print_message(f"#> Starting from checkpoint {args.checkpoint} -- but NOT the optimizer!")
-        checkpoint = torch.load(args.checkpoint, map_location='cpu')
-        try:
-            ser_model.load_state_dict(checkpoint['model_state_dict'])
-        except:
-            print_message("[WARNING] Loading checkpoint with strict=False")
-            ser_model.load_state_dict(checkpoint['model_state_dict'], strict=False)
-
-    if args.rank == 0:
-        torch.distributed.barrier()
-
-    ser_model = ser_model.to(DEVICE)
-
-    if args.distributed:
-        ser_model = torch.nn.parallel.DistributedDataParallel(ser_model, device_ids=[args.rank],
-                                                            output_device=args.rank,
-                                                            find_unused_parameters=True)
-
+    ser_model = ser_model.cuda()
 
     amp = MixedPrecisionManager(args.amp)
-    optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()),lr = 0.005,weight_decay=1e-5)
+    optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()),lr = 0.0005,weight_decay=1e-5)
 
     def training(step):
         ser_model.train()
         reader = PretrainBatcher(args, args.triples,(0 if args.rank == -1 else args.rank), args.nranks)
         train_loss = 0.0
         start_batch_idx = 0
-
-        if args.resume:
-            assert args.checkpoint is not None
-            start_batch_idx = checkpoint['batch']
-
-            reader.skip_to_batch(start_batch_idx, checkpoint['arguments']['bsize'])
 
         i = 0
         for batch_idx, BatchSteps in zip(range(start_batch_idx,args.maxsteps), reader):
@@ -113,8 +74,8 @@ def train(args):
     print("finish training, now test on testset")
     best_model = torch.load("checkpoint.dnn")
     evaluate(args,best_model,TEST_PATH)
+    sleep(2)
 
-from sklearn.metrics import accuracy_score
 def evaluate(args,model,path):
     reader = PretrainBatcher(args, path,(0 if args.rank == -1 else args.rank), args.nranks)
     start_batch_idx = 0
@@ -141,11 +102,12 @@ def evaluate(args,model,path):
                         if int(pred_label[j]) == int(labels[j]):
                             class_correct[int(labels[j])] += 1
     unweight_acc = []
+    weight_acc = []
     for j in range(CLASS_NUM):
-        unweight_acc.append(class_correct[j]/class_tot[j])
-    
+        unweight_acc.append(class_correct[j]/(class_tot[j]+0.0001))
+        weight_acc.append((class_correct[j]/class_tot[j])*(class_tot[j]/sum(class_tot)))
     LOG.write("unweighted test accuracy"+str(sum(unweight_acc)/4)+"\n")
     print("UA= ",sum(unweight_acc)/4)              
-    LOG.write("weighted test accuracy"+str(tot_acc/i)+"\n")
-    print("weighted test accuracy"+str(tot_acc/i)+"\n")
+    LOG.write("weighted test accuracy"+str(tot_acc/(i+0.0001))+"\n")
+    print("weighted test accuracy"+str(tot_acc/(i+0.0001))+"\n")
     return sum(unweight_acc)/4 , tot_acc/i

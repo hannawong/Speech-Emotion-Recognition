@@ -27,9 +27,12 @@ class PretrainBatcher():
                 continue
             line_split = line.strip().split(",")
             audio_file = line_split[0]
-            label = cls_label_map[line_split[1]]
-            labels.append(label)
-            audio_filenames.append(audio_file)
+            try:
+                label = cls_label_map[line_split[1]]
+                labels.append(label)
+                audio_filenames.append(audio_file)
+            except:
+                print("no")
 
         self.position += line_idx + 1
 
