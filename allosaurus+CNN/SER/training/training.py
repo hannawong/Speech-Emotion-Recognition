@@ -12,8 +12,8 @@ from SER.utils.utils import print_message
 DEVICE = torch.device("cuda")
 LOG = open("log.txt",'w')
 CLASS_NUM = 4
-TEST_PATH = "/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_05M.test.csv"
-VAL_PATH = "/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_05M.test.csv"
+TEST_PATH = "/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_03M.test.csv"
+VAL_PATH = "/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_03M.test.csv"
 
 def train(args):
 
@@ -57,7 +57,7 @@ def train(args):
 
             
     step = 0
-    for epoch in range(60):
+    for epoch in range(20):
         print("="*30+"epoch: "+str(epoch)+"="*30+">")
         LOG.write("="*30+"epoch: "+str(epoch)+"="*30+">"+"\n")
         training(step)
