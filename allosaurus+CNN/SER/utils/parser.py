@@ -42,6 +42,7 @@ class Arguments():
         self.add_argument('--bsize', dest='bsize', default=32, type=int)
         self.add_argument('--accum', dest='accumsteps', default=2, type=int)
         self.add_argument('--amp', dest='amp', default=False, action='store_true')
+        self.add_argument('--GE2E', dest='GE2E', default=False, action='store_true')
 
     def add_model_inference_parameters(self):
         self.add_argument('--checkpoint', dest='checkpoint', required=True)

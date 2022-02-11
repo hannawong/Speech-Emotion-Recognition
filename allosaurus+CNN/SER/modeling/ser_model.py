@@ -12,8 +12,8 @@ class SER_MODEL(nn.Module):
         #########  for SER classification task   ##########
         self.conv1d_1 = nn.Conv1d(in_channels=230, out_channels=128, kernel_size=3,padding = "same")
         self.conv1d_2 = nn.Conv1d(in_channels=230, out_channels=128, kernel_size=5,padding = "same")
-        self.lstm = nn.LSTM(128, 64, 1, bidirectional=True)
-        self.dense1 = nn.Linear(64*2, hidden_size*4)
+        self.lstm = nn.LSTM(128, 128, 1, bidirectional=True)
+        self.dense1 = nn.Linear(128*2, hidden_size*4)
         self.bn = torch.nn.BatchNorm1d(hidden_size*4)
         self.dropout = nn.Dropout(0.1)
         self.dense2 = nn.Linear(hidden_size*4,hidden_size)
@@ -22,10 +22,10 @@ class SER_MODEL(nn.Module):
 
          
 
-    def forward(self, feat_emb, label = None):
-        return self.classification_score(feat_emb, label)
+    def forward(self, feat_emb, ge2e_emb,label = None):
+        return self.classification_score(feat_emb,ge2e_emb,label)
 
-    def classification_score(self,feat_emb,label):
+    def classification_score(self,feat_emb,ge2e_emb,label):
         feat_emb = feat_emb.permute(0, 2, 1)
         print(feat_emb.shape)
         x = self.conv1d_1(feat_emb)
@@ -35,6 +35,10 @@ class SER_MODEL(nn.Module):
         x = torch.add(x,x1)
         x,_ = self.lstm(x)
         x = torch.mean(x,axis = 1)
+        
+        ge2e_emb = ge2e_emb.squeeze()
+        x = torch.add(x,ge2e_emb)
+
         x = self.dense1(x)
         x = self.bn(x)
         x = torch.tanh(x)

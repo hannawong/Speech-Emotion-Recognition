@@ -3,6 +3,7 @@ from SER.training.utils import  tensorize_triples
 
 class PretrainBatcher():
     def __init__(self, args, path, rank=0, nranks=1):
+        self.args = args
         self.rank, self.nranks = rank, nranks
         self.bsize, self.accumsteps = args.bsize, args.accumsteps
 
@@ -43,7 +44,7 @@ class PretrainBatcher():
 
     def collate(self, audio_filenames,labels):
         assert len(audio_filenames) == self.bsize
-        return self.tensorize_triples(audio_filenames, labels, self.bsize // self.accumsteps)
+        return self.tensorize_triples(self.args,audio_filenames, labels, self.bsize // self.accumsteps)
 
 
     def skip_to_batch(self, batch_idx, intended_batch_size):
