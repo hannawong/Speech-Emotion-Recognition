@@ -7,7 +7,7 @@ from SER.utils.runs import Run
 from SER.utils.utils import save_checkpoint
 from SER.parameters import SAVED_CHECKPOINTS
 
-MAX_LEN = 100
+MAX_LEN = 200
 ALLO_EMB_PATH = "/data1/jiayu_xiao/project/wzh/data/allo_embedding/"
 GE2E_EMB_PATH = "../data/GE2E/"
 
@@ -44,13 +44,17 @@ def shuf_order(langs):
 def tensorize_triples(args,audio_files, labels, bsize): ##transform sentence into ids and masks
     assert bsize is None or len(audio_files) % bsize == 0
     allo_embs = []
+    length = []
     for file in audio_files:
         allo_emb = pkl.load(open(ALLO_EMB_PATH+file.split("/")[-1]+".pkl","rb"))
         if allo_emb.shape[1] >= MAX_LEN:
             allo_emb = allo_emb[0,:MAX_LEN,:]
+            length.append(MAX_LEN-1)
         else:
+            length.append(allo_emb.shape[1]-1)
             zero = torch.zeros((MAX_LEN-allo_emb.shape[1], allo_emb.shape[2]))
             allo_emb = torch.cat((allo_emb[0], zero), dim=0)
+            
         allo_embs.append(allo_emb)
     allosaurus_embedding = torch.stack(allo_embs,axis = 0) ##len,emb_size
 
@@ -66,18 +70,17 @@ def tensorize_triples(args,audio_files, labels, bsize): ##transform sentence int
     GE2E_embedding = torch.stack(GE2E_embs,axis = 0)
     print(GE2E_embedding.shape)
     
-    query_batches = _split_into_batches(allosaurus_embedding,GE2E_embedding,labels,bsize)
+    query_batches = _split_into_batches(allosaurus_embedding,GE2E_embedding,labels,length,bsize)
     batches = []
-    for (embed,GE2E, label) in query_batches:
-        Q = (embed,GE2E,label)
+    for (embed,GE2E, label,length) in query_batches:
+        Q = (embed,GE2E,label,length)
         batches.append(Q)
 
     return batches
 
 
-def _split_into_batches(allosaurus_embedding, GE2E_embedding, labels,bsize):
+def _split_into_batches(allosaurus_embedding, GE2E_embedding, labels,length,bsize):
     batches = []
     for offset in range(0, allosaurus_embedding.shape[0], bsize):
-        batches.append((allosaurus_embedding[offset:offset+bsize], GE2E_embedding[offset:offset+bsize],labels[offset:offset+bsize]))
-
+        batches.append((allosaurus_embedding[offset:offset+bsize], GE2E_embedding[offset:offset+bsize],labels[offset:offset+bsize],length[offset:offset+bsize]))
     return batches

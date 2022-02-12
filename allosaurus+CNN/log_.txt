@@ -1,20 +1,33 @@
+### base:
+               UA              WA
+Session1F:   0.6524          0.5702 
+Session1M:   0.5362          0.5292 
+Session2F:   0.5625          0.5897  
+Session2M:   0.5735          0.5527 
+Session3F:   0.4658          0.4589 
+Session3M:   0.4510          0.4452  
+Session4F:   0.5124          0.4980  
+Session4M:   0.5128          0.4765  
+Session5F:   0.5267          0.4941 
+Session5M:   0.4769          0.4648 
+             
+avg:         0.5270
+
+
 ### CNN(k=3,5):
                UA              WA
-Session1F:   0.5637          0.5077 o
-Session1M:   0.5607          0.5546 o
-Session2F:   0.6284          0.5468 o
-Session2M:   0.5846          0.5370 o
-Session3F:   0.4771          0.4609 o
-Session3M:   0.4582          0.4628 o
-Session4F:   0.5049          0.4784 o
-Session4M:   0.4927          0.4413 o
-Session5F:   0.5667          0.5116 o
+Session1F:   0.6623          0.5077 
+Session1M:   0.5607          0.5546 
+Session2F:   0.6284          0.5468 
+Session2M:   0.5846          0.5370 
+Session3F:   0.4771          0.4609 
+Session3M:   0.4582          0.4628 
+Session4F:   0.5049          0.4784 
+Session4M:   0.4927          0.4413 
+Session5F:   0.5667          0.5116 
 Session5M:   0.4807          0.4413
 
-avg:         0.60502
-
-
-
+avg:         0.5416
 
 
 ### GE2E+CNN(k=3,5):
@@ -31,4 +44,20 @@ Session5F:   0.6163          0.5878
 Session5M:   0.5461          0.5038
 
 avg:         0.60502
+
+## GE2E+CNN(k=3,5)+self-attention:
+               UA              WA
+Session1F:   0.7086          0.6210
+Session1M:   0.6546          0.6425
+Session2F:   0.6960          0.6171
+Session2M:   0.6214          0.5937
+Session3F:   0.5427          0.5371   
+Session3M:   0.6240          0.6230
+Session4F:   0.5616          0.5527
+Session4M:   0.5930          0.5702
+Session5F:   0.6460          0.6034
+Session5M:   0.5730          0.5253
+
+avg:         0.6221
+
 

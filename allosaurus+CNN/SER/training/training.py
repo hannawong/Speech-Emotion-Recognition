@@ -1,5 +1,4 @@
 import random
-from time import sleep
 import torch
 import numpy as np
 from transformers import AdamW
@@ -39,15 +38,16 @@ def train(args):
 
         i = 0
         for batch_idx, BatchSteps in zip(range(start_batch_idx,args.maxsteps), reader):
-            for feat_emb, ge2e_emb, labels in BatchSteps: 
+            for feat_emb, ge2e_emb, labels,length in BatchSteps: 
                 i += 1 
                 optimizer.zero_grad()
                 feat_emb = torch.Tensor(feat_emb).cuda() ##[32,100,230]
                 ge2e_emb = torch.Tensor(ge2e_emb).cuda()
                 labels = torch.Tensor(labels).cuda() ##[32]
+                length = torch.Tensor(length).cuda()
 
                 with amp.context():
-                    loss,_ = ser_model(feat_emb,ge2e_emb,labels)
+                    loss,_ = ser_model(feat_emb,ge2e_emb,labels,length)
                     amp.backward(loss)
                     print(loss)
                     train_loss += loss.item()
@@ -60,11 +60,14 @@ def train(args):
 
             
     step = 0
-    for epoch in range(60):
+    for epoch in range(10):
         print("="*30+"epoch: "+str(epoch)+"="*30+">")
         LOG.write("="*30+"epoch: "+str(epoch)+"="*30+">"+"\n")
         training(step)
         uacc,wacc = evaluate(args,ser_model,VAL_PATH)
+        print("best validation score now is ",best_uacc)
+        uacc_test,wacc_test = evaluate(args,ser_model,TEST_PATH)
+        print("On test set",uacc_test," ,",wacc_test)
         if not best_model:
             best_model = ser_model
         else:
@@ -76,7 +79,6 @@ def train(args):
     print("finish training, now test on testset")
     best_model = torch.load("checkpoint.dnn")
     evaluate(args,best_model,TEST_PATH)
-    sleep(2)
 
 def evaluate(args,model,path):
     reader = PretrainBatcher(args, path,(0 if args.rank == -1 else args.rank), args.nranks)
@@ -88,12 +90,14 @@ def evaluate(args,model,path):
 
     with torch.no_grad():
         for batch_idx, BatchSteps in zip(range(start_batch_idx,args.maxsteps), reader):
-            for feat_emb,ge2e_emb, labels in BatchSteps: 
+            for feat_emb,ge2e_emb, labels ,length in BatchSteps: 
                 i += 1 
-                feat_emb = torch.Tensor(feat_emb).cuda() ##[32,100,230]
-                labels = torch.Tensor(labels).cuda() ##[32]
-                ge2e_emb = torch.Tensor(ge2e_emb).cuda() ##[32,100,230]
-                loss, output = model(feat_emb,ge2e_emb,labels)
+                feat_emb = torch.Tensor(feat_emb).cuda() ##[bz,100,230]
+                labels = torch.Tensor(labels).cuda() ##[bz]
+                ge2e_emb = torch.Tensor(ge2e_emb).cuda() ##[bz,100,230]
+                length = torch.Tensor(length).cuda()
+
+                loss, output = model(feat_emb,ge2e_emb,labels,length)
                 pred_label = torch.argmax(output,dim = 1)
                 acc = accuracy_score(pred_label.cpu().detach(),labels.cpu().detach())
                 tot_acc += acc
