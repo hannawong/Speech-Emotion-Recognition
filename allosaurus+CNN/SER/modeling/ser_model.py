@@ -5,7 +5,7 @@ import math
 import numpy as np
 
 class SER_MODEL(nn.Module):
-    def __init__(self, audio_maxlen, num_labels=4, hidden_size = 64):
+    def __init__(self, audio_maxlen, num_labels, hidden_size = 64):
 
         super(SER_MODEL, self).__init__()
         self.audio_maxlen = audio_maxlen
@@ -43,7 +43,7 @@ class SER_MODEL(nn.Module):
         return mask
     
 
-    def self_attention_layer(self,lstm_output,length):  # TODO: multi-head self-attention; add attention mask
+    def self_attention_layer(self,lstm_output,length):  # TODO: multi-head self-attention
         last_hidden_state = [lstm_output[i,length[i].long(),:] for i in range(lstm_output.shape[0])] ## the actual hidden state!
         last_hidden_state = torch.stack(last_hidden_state,axis = 0)
         print(last_hidden_state.shape)
@@ -68,6 +68,7 @@ class SER_MODEL(nn.Module):
 
 
     def classification_score(self,feat_emb,ge2e_emb,label,length):
+        
         feat_emb = feat_emb.permute(0, 2, 1)
         x = self.conv1d_1(feat_emb)
         x1 = self.conv1d_2(feat_emb)
@@ -79,10 +80,8 @@ class SER_MODEL(nn.Module):
         
         x = self.self_attention_layer(x,length)
         x = self.adaptor(x)
-        #x = torch.mean(x,axis = 1)
         
         ge2e_emb = ge2e_emb.squeeze()
-        print(x.shape,ge2e_emb.shape)
         x = torch.add(x,ge2e_emb)
 
         x = self.dense1(x)

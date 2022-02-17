@@ -3,6 +3,7 @@ import torch
 import random
 import pickle as pkl
 import numpy as np
+import pandas as pd
 from SER.utils.runs import Run
 from SER.utils.utils import save_checkpoint
 from SER.parameters import SAVED_CHECKPOINTS
@@ -84,3 +85,16 @@ def _split_into_batches(allosaurus_embedding, GE2E_embedding, labels,length,bsiz
     for offset in range(0, allosaurus_embedding.shape[0], bsize):
         batches.append((allosaurus_embedding[offset:offset+bsize], GE2E_embedding[offset:offset+bsize],labels[offset:offset+bsize],length[offset:offset+bsize]))
     return batches
+
+
+from sklearn.utils import shuffle
+def split_train_val_test_german(path):
+    df = pd.read_csv(path)
+    df = shuffle(df)
+    df_train = df[:int(len(df)*0.7)]
+    df_val = df[int(len(df)*0.7):int(len(df)*0.8)]
+    df_test = df[int(len(df)*0.8):]
+    df_train.to_csv(path[:-9]+"train.csv")
+    df_test.to_csv(path[:-9]+"test.csv")
+    df_val.to_csv(path[:-9]+"val.csv")
+    return path[:-9]+"train.csv",path[:-9]+"test.csv",path[:-9]+"val.csv"

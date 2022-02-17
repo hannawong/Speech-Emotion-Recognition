@@ -47,7 +47,7 @@ avg:         0.60502
 
 ## GE2E+CNN(k=3,5)+self-attention:
                UA              WA
-Session1F:   0.7086          0.6210
+Session1F:   0.7322          0.6210
 Session1M:   0.6546          0.6425
 Session2F:   0.6960          0.6171
 Session2M:   0.6214          0.5937
@@ -58,6 +58,6 @@ Session4M:   0.5930          0.5702
 Session5F:   0.6460          0.6034
 Session5M:   0.5730          0.5253
 
-avg:         0.6221
+avg:         0.6244
 
 

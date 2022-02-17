@@ -5,8 +5,8 @@ from pathlib import Path
 import pickle
 import argparse
 
-TRAIN_PATH = "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/allosaurus+CNN/iemocap/_iemocap_01M.train.csv"
-ALLO_EMB_PATH = "/data/jiayu_xiao/IEMOCAP/allo_embedding/"
+TRAIN_PATH = "/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN/emodb/total.csv"
+ALLO_EMB_PATH = "/data1/jiayu_xiao/project/wzh/data/ger_allo_embedding/"
 
 def get_allosaurus_embedding(input):
     # input file/path
@@ -59,9 +59,7 @@ if __name__ == '__main__':
         print(i)
         line = INPUT_FILE[i]
         line = line.split(",")
-        file_name = line[0]
-        if file_name[-3:]!="wav":
-            continue
+        file_name = line[1]
         allo_emb = get_allosaurus_embedding(file_name)  ##(1,65,230)
         output = open(ALLO_EMB_PATH+file_name.split("/")[-1]+'.pkl', 'wb')
         pickle.dump(allo_emb, output)

@@ -1,12 +1,15 @@
 import random
+from re import A
 import torch
 import numpy as np
 from transformers import AdamW
 from sklearn.metrics import accuracy_score
 from SER.utils.amp import MixedPrecisionManager
 from SER.training.pretrainbatcher import PretrainBatcher
+from SER.training.batcher_german import PretrainBatcher_ge
 from SER.modeling.ser_model import SER_MODEL
 from SER.utils.utils import print_message
+from SER.training.utils import split_train_val_test_german
 
 DEVICE = torch.device("cuda")
 LOG = open("log.txt",'w')
@@ -17,10 +20,21 @@ def train(args):
     random.seed(12345)
     np.random.seed(12345)
     torch.manual_seed(12345)
-    ser_model = SER_MODEL(audio_maxlen=100)
-    print(args.triples)
+    if args.langs == "en":
+        ser_model = SER_MODEL(audio_maxlen=200,num_labels=4)
+    if args.langs == "ge":
+        ser_model = SER_MODEL(audio_maxlen=200,num_labels=6)
+        global CLASS_NUM
+        CLASS_NUM = 6
+
+    
+
     TEST_PATH = args.triples[:-10]+".test.csv"
     VAL_PATH = args.triples[:-10]+".val.csv"
+
+    if args.langs == "ge":
+        args.triples, TEST_PATH, VAL_PATH = split_train_val_test_german(args.triples)
+        
 
     best_model = None
     best_uacc = 0.0
@@ -28,11 +42,15 @@ def train(args):
     ser_model = ser_model.cuda()
 
     amp = MixedPrecisionManager(args.amp)
-    optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()),lr = 0.0005,weight_decay=1e-5)
+    optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()),lr = args.lr,weight_decay=1e-5)
 
     def training(step):
         ser_model.train()
-        reader = PretrainBatcher(args, args.triples,(0 if args.rank == -1 else args.rank), args.nranks)
+        if args.langs == "en":
+            reader = PretrainBatcher(args, args.triples,(0 if args.rank == -1 else args.rank), args.nranks)
+        if args.langs == "ge":
+            reader = PretrainBatcher_ge(args,args.triples,(0 if args.rank == -1 else args.rank), args.nranks)
+
         train_loss = 0.0
         start_batch_idx = 0
 
@@ -81,7 +99,11 @@ def train(args):
     evaluate(args,best_model,TEST_PATH)
 
 def evaluate(args,model,path):
-    reader = PretrainBatcher(args, path,(0 if args.rank == -1 else args.rank), args.nranks)
+    print("begin evaluate...")
+    if args.langs == "en":
+        reader = PretrainBatcher(args, path,(0 if args.rank == -1 else args.rank), args.nranks)
+    if args.langs == "ge":
+        reader = PretrainBatcher_ge(args, path,(0 if args.rank == -1 else args.rank), args.nranks)
     start_batch_idx = 0
     class_tot = [0]*CLASS_NUM 
     class_correct = [0]*CLASS_NUM
