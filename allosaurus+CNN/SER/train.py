@@ -3,7 +3,7 @@ from SER.training.training import train
 
 
 def main():
-    parser = Arguments(description='Training with MLM.')
+    parser = Arguments(description='Training')
 
     parser.add_model_parameters()
     parser.add_model_training_parameters()

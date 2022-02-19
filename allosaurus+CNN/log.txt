@@ -1,544 +1,65 @@
-[Feb 16, 10:53:02] It seems that  /data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN/MSMARCO-psg/train.py/msmarco.psg.rronly  already exists.
-
-
-[Feb 16, 10:53:02] #> Note: Output directory /data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN/MSMARCO-psg/train.py/msmarco.psg.rronly/logs/ already exists
-
-
-[Feb 16, 10:53:02] {'root': '/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN', 'experiment': 'MSMARCO-psg', 'run': 'msmarco.psg.rronly', 'rank': -1, 'similarity': 'cosine', 'dim': 128, 'query_maxlen': 32, 'doc_maxlen': 180, 'langs': 'ge', 'mask_punctuation': False, 'resume': False, 'resume_optimizer': False, 'checkpoint': None, 'save_step': 1000, 'mlm_probability': 0.15, 'lr': 0.0005, 'maxsteps': 20000, 'bsize': 32, 'accumsteps': 1, 'amp': False, 'GE2E': False, 'triples': '/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN/emodb/total.csv', 'queries': None, 'collection': None, 'prop': None} 
-
 ==============================epoch: 0==============================>
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.8060, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 0 1.8060322999954224
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.7433, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 1 1.774665117263794
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.7285, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 2 1.759287675221761
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.7018, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 3 1.744913637638092
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.7346, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 4 1.7428607940673828
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.6386, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 5 1.725479503472646
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.6588, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 6 1.7159531627382552
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.6461, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 7 1.7072257548570633
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.6038, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 8 1.6957336001925998
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.5249830840302453
+loss: 1.69573356045617
+unweighted test accuracy0.5249830840302453
 weighted test accuracy0.2812218778122188
-
-best validation score now is  0.0
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.43913720400045986
+unweighted test accuracy0.43913720400045986
 weighted test accuracy0.40622968851557417
-
-On test set 0.43913720400045986  , 0.40625
 ==============================epoch: 1==============================>
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.4979, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 0 1.497855305671692
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.5720, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 1 1.5349417328834534
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.6520, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:08] 2 1.5739449262619019
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.5712, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 3 1.5732475221157074
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.6544, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 4 1.5894807815551757
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.5405, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 5 1.5813167293866475
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.5116, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 6 1.5713516814368111
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.5056, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 7 1.5631265342235565
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.4622, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 8 1.551915102534824
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.5499828340327453
+loss: 1.551915102534824
+unweighted test accuracy0.5499828340327453
 weighted test accuracy0.3124687531246875
-
-best validation score now is  0.0
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.49366152946011316
+unweighted test accuracy0.49366152946011316
 weighted test accuracy0.4374781260936953
-
-On test set 0.49366152946011316  , 0.4375
-saving best model...
 ==============================epoch: 2==============================>
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.3305, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 0 1.3305368423461914
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.4292, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 1 1.3798688650131226
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.5684, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 2 1.4427079757054646
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.4652, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 3 1.4483219385147095
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.5787, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 4 1.4743988513946533
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.3853, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 5 1.4595568577448528
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.3805, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 6 1.4482662848063879
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.4000, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 7 1.4422342032194138
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.3173, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 8 1.4283564223183527
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.5749825840352453
+loss: 1.428356409072876
+unweighted test accuracy0.5749825840352453
 weighted test accuracy0.3437156284371563
-
-best validation score now is  0.5499828340327453
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.5545581229968223
+unweighted test accuracy0.5545581229968223
 weighted test accuracy0.46872656367181637
-
-On test set 0.5545581229968223  , 0.46875
-saving best model...
 ==============================epoch: 3==============================>
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.2185, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 0 1.21852707862854
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.2962, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 1 1.2573413848876953
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.4960, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:09] 2 1.3368945916493733
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.3317, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 3 1.3356077075004578
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.4827, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 4 1.3650192499160767
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.2455, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 5 1.3450976212819417
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.2416, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 6 1.3303159645625524
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.2712, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 7 1.322924181818962
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.2161, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 8 1.3110503885481093
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.5749825840352453
+loss: 1.3110503355662029
+unweighted test accuracy0.5749825840352453
 weighted test accuracy0.3437156284371563
-
-best validation score now is  0.5749825840352453
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.6359296410813781
+unweighted test accuracy0.6359296410813781
 weighted test accuracy0.5155992200389979
-
-On test set 0.6359296410813781  , 0.515625
 ==============================epoch: 4==============================>
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.0796, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 0 1.0796236991882324
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.1449, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 1 1.1122689247131348
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.3582, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 2 1.1942622661590576
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.2609, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 3 1.2109128534793854
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.3699, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 4 1.2427170038223267
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.0803, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 5 1.2156497836112976
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.0670, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 6 1.194413321358817
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.0920, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 7 1.1816066354513168
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.1413, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 8 1.1771282354990642
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.6583145285028376
+loss: 1.177128381199307
+unweighted test accuracy0.6583145285028376
 weighted test accuracy0.4062093790620938
-
-best validation score now is  0.5749825840352453
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.8198637249364391
+unweighted test accuracy0.8198637249364391
 weighted test accuracy0.6093445327733613
-
-On test set 0.8198637249364391  , 0.609375
-saving best model...
 ==============================epoch: 5==============================>
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.9728, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 0 0.9727554321289062
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.0677, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 1 1.020245373249054
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.1372, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 2 1.059236725171407
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.1232, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 3 1.0752165913581848
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.1830, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 4 1.0967805147171021
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.9224, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 5 1.0677216947078705
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.9122, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:10] 6 1.0455039313861303
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.9257, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 7 1.0305270627140999
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.9429, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 8 1.020793894926707
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.7499800007416335
+loss: 1.0207947625054254
+unweighted test accuracy0.7499800007416335
 weighted test accuracy0.49995000499950004
-
-best validation score now is  0.6583145285028376
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.7859273077852663
+unweighted test accuracy0.7859273077852663
 weighted test accuracy0.5780960951952402
-
-On test set 0.7859273077852663  , 0.578125
-saving best model...
 ==============================epoch: 6==============================>
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.9543, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 0 0.9543260335922241
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.9352, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 1 0.9447468221187592
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.9691, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 2 0.952872653802236
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.0254, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 3 0.9709947854280472
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(1.0244, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 4 0.9816723227500915
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.6950, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 5 0.9339005450407664
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.7715, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 6 0.910703684602465
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.7421, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 7 0.8896241635084152
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.7713, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 8 0.8764716386795044
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.5999865004266492
+loss: 0.8764727910359701
+unweighted test accuracy0.5999865004266492
 weighted test accuracy0.43745625437456254
-
-best validation score now is  0.7499800007416335
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.7795550397082105
+unweighted test accuracy0.7795550397082105
 weighted test accuracy0.5780960951952402
-
-On test set 0.7795550397082105  , 0.578125
 ==============================epoch: 7==============================>
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.7935, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 0 0.7934561371803284
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.8073, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 1 0.8003641366958618
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.7850, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 2 0.7952500581741333
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.8243, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 3 0.8025165349245071
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.8328, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 4 0.8085666298866272
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.5125, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 5 0.7592260837554932
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.6119, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 6 0.7381850821631295
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.5964, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 7 0.7204636633396149
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.6044, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 8 0.7075666652785407
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.6249862504291492
+loss: 0.7075736853811476
+unweighted test accuracy0.6249862504291492
 weighted test accuracy0.4687031296870313
-
-best validation score now is  0.7499800007416335
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.8000299642560573
+unweighted test accuracy0.8000299642560573
 weighted test accuracy0.5937203139843007
-
-On test set 0.8000299642560573  , 0.59375
 ==============================epoch: 8==============================>
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.5792, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 0 0.5791589617729187
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.6415, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 1 0.6103318631649017
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.6784, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:11] 2 0.6330265601476034
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.6900, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 3 0.6472698897123337
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.6712, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 4 0.6520592212677002
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.3824, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 5 0.607115238904953
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.4989, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 6 0.5916545476232257
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.5047, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 7 0.5807799622416496
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.5060, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 8 0.5724704596731398
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.6249862504291492
+loss: 0.5724795493814681
+unweighted test accuracy0.6249862504291492
 weighted test accuracy0.4687031296870313
-
-best validation score now is  0.7499800007416335
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.9779501020121851
+unweighted test accuracy0.9779501020121851
 weighted test accuracy0.687465626718664
-
-On test set 0.9779501020121851  , 0.6875
 ==============================epoch: 9==============================>
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.4637, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 0 0.4636695981025696
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.5082, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 1 0.48593848943710327
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.5111, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 2 0.49431989590326947
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.4743, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 3 0.48931261897087097
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.5080, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 4 0.49304652214050293
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.3725, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 5 0.4729551076889038
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.3801, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 6 0.4596859429563795
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.3768, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 7 0.4493311531841755
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-tensor(0.4023, device='cuda:0', grad_fn=<NllLossBackward0>)
-[Feb 16, 10:53:12] 8 0.4441060523192088
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.7916459729754297
+loss: 0.44375286830796135
+unweighted test accuracy0.7916459729754297
 weighted test accuracy0.5311968803119688
-
-best validation score now is  0.7499800007416335
-begin evaluate...
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-torch.Size([32, 1, 256])
-torch.Size([32, 128])
-UA=  0.8581173413218033
+unweighted test accuracy0.8581173413218033
 weighted test accuracy0.6093445327733613
-
+unweighted test accuracy0.8581173413218033
+weighted test accuracy0.6093445327733613
 On test set 0.8581173413218033  , 0.609375
 saving best model...
 finish training, now test on testset
