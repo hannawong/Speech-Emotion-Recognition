@@ -61,3 +61,56 @@ Session5M:   0.5730          0.5253
 avg:         0.6244
 
 
+######################## Alation study on features ######################
+## Allo: (30 epoch, bz 256, lr 0.001)
+               UA              WA
+Session1F:   0.5957          0.5429 o 
+Session1M:   0.7000          0.6913 o
+Session2F:   0.7400          0.6171 o  
+Session2M:   0.5403          0.5077 o
+Session3F:   0.5007          0.4882 o 
+Session3M:   0.6384          0.6405 o  
+Session4F:   0.5606          0.5409 o   
+Session4M:   0.6462          0.6171 o
+Session5F:   0.7019          0.6444 o
+Session5M:   0.5908          0.5312 o
+             
+avg:         0.6214
+
+## Allo+GE2E: (30 epoch, bz 256, lr 0.001)
+               UA              WA
+Session1F:   0.8878          0.8671 o
+Session1M:   0.6216          0.6015 o
+Session2F:   0.6994          0.5936 o 
+Session2M:   0.8607          0.8398 o 
+Session3F:   0.5232          0.5116 o   
+Session3M:   0.8097          0.8085 o 
+Session4F:   0.8093          0.7870 o 
+Session4M:   0.5643          0.5507 
+Session5F:   0.6712          0.6288 
+Session5M:   0.8450          0.8319 
+
+avg:         0.7292
+
+## Allo+GE2E+MFCC: (30 epoch, bz 256, lr 0.001)
+               UA              WA
+Session1F:   0.7157          0.6327
+Session1M:   0.6546          0.6425
+Session2F:   0.6960          0.6171
+Session2M:   0.6214          0.5937
+Session3F:   0.5427          0.5371   
+Session3M:   0.6240          0.6230
+Session4F:   0.5616          0.5527
+Session4M:   0.5930          0.5702
+Session5F:   0.6460          0.6034
+Session5M:   0.5730          0.5253
+
+avg:         0.6244
+
+
+
+
+
+
+
+
