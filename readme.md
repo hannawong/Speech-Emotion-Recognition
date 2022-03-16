@@ -1,6 +1,8 @@
 # Speech Emotion Recognition
 
 ### Prerequisite
+
+#### 1. Install packages
 use the following command to install packages:
 
 ```sh
@@ -10,15 +12,13 @@ pip install transformers
 ```
 The torch version is `1.10.0+cu111`.
 
-### Extract Features 
+#### 2. Download Dataset and Features
 
-#### 1. Allosaurus Features
-The `run.py` file in the original Allosaurus project is modified in order to extract the feature embedding just before the softmax layer. In order to get the Allosaurus embedding for your wav files, please change the `TRAIN_PATH` in `run.py` as the csv files containing all the training samples, and change `ALLO_EMB_PATH` to the directory in which you want to store the feature pkl.
-Then simply run
-```sh
-python -m allosaurus.run
-```
-to extract allosaurus features. 
+Wav files: https://drive.google.com/drive/folders/12V4A78u_XOp7vXlUrF5vweXEF9nb4btJ?usp=sharing
+Allosaurus features: https://drive.google.com/drive/folders/1YDjsl05ubArpvo4kk9yzXjnbexXgInHP?usp=sharing
+GE2E features is in data/GE2E
+MFCC features: https://drive.google.com/drive/folders/12aaC-n4o0qXSL53rRFcLWqx6ar1J4iUs?usp=sharing
+
 
 ### Train the Model
 Firstly, you need to change the paths in file `allosaurus+CNN/SER/training/utils.py` to the path in your own environment.
