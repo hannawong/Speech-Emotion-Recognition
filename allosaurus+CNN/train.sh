@@ -1,6 +1,6 @@
-CUDA_VISIBLE_DEVICES="1" \
+CUDA_VISIBLE_DEVICES="0" \
 python -m \
-SER.train --bsize 256 --accum 1 --lr 0.001 --GE2E \
---triples /data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_01F.train.csv \
+SER.train --bsize 32 --accum 1 --lr 0.001 --GE2E \
+--triples /content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_01F.train.csv \
 --langs "en" \
---root /data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/allosaurus+CNN --experiment MSMARCO-psg --run msmarco.psg.rronly --maxsteps 20000
+--root /content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/ --experiment MSMARCO-psg --run msmarco.psg.rronly --maxsteps 20000

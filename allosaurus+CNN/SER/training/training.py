@@ -12,7 +12,7 @@ from SER.utils.utils import print_message
 from SER.training.utils import split_train_val_test_german
 from torch.optim.lr_scheduler import StepLR
 
-DEVICE = torch.device("cuda")
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 LOG = open("log.txt",'w')
 CLASS_NUM = 4
 
@@ -42,7 +42,7 @@ def train(args):
     best_model = None
     best_uacc = 0.0
     best_wacc = 0.0
-    ser_model = ser_model.cuda()
+    ser_model = ser_model.to(DEVICE)
 
     amp = MixedPrecisionManager(args.amp)
     optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()),lr = args.lr,weight_decay=1e-5)
@@ -64,12 +64,12 @@ def train(args):
             for feat_emb, ge2e_emb, mfcc_emb, labels,length,mfcc_length in BatchSteps: 
                 i += 1 
                 optimizer.zero_grad()
-                feat_emb = torch.Tensor(feat_emb).cuda() ##[bz,200,640]
-                ge2e_emb = torch.Tensor(ge2e_emb).cuda()
-                mfcc_emb = torch.Tensor(mfcc_emb).cuda() ##[bz,200,24]
-                labels = torch.Tensor(labels).cuda() ##[bz]
-                length = torch.Tensor(length).cuda()
-                mfcc_length = torch.Tensor(mfcc_length).cuda()
+                feat_emb = torch.Tensor(feat_emb).to(DEVICE) ##[bz,200,640]
+                ge2e_emb = torch.Tensor(ge2e_emb).to(DEVICE)
+                mfcc_emb = torch.Tensor(mfcc_emb).to(DEVICE) ##[bz,200,24]
+                labels = torch.Tensor(labels).to(DEVICE) ##[bz]
+                length = torch.Tensor(length).to(DEVICE)
+                mfcc_length = torch.Tensor(mfcc_length).to(DEVICE)
                 
 
                 with amp.context():
@@ -127,12 +127,12 @@ def evaluate(args,model,path):
         for batch_idx, BatchSteps in zip(range(start_batch_idx,args.maxsteps), reader):
             for feat_emb,ge2e_emb, mfcc_emb,labels ,length,mfcc_length in BatchSteps: 
                 i += 1 
-                feat_emb = torch.Tensor(feat_emb).cuda() ##[bz,100,230]
-                labels = torch.Tensor(labels).cuda() ##[bz]
-                ge2e_emb = torch.Tensor(ge2e_emb).cuda() ##[bz,100,230]
-                length = torch.Tensor(length).cuda()
-                mfcc_emb = torch.Tensor(mfcc_emb).cuda()
-                mfcc_length = torch.Tensor(mfcc_length).cuda()
+                feat_emb = torch.Tensor(feat_emb).to(DEVICE) ##[bz,100,230]
+                labels = torch.Tensor(labels).to(DEVICE) ##[bz]
+                ge2e_emb = torch.Tensor(ge2e_emb).to(DEVICE) ##[bz,100,230]
+                length = torch.Tensor(length).to(DEVICE)
+                mfcc_emb = torch.Tensor(mfcc_emb).to(DEVICE)
+                mfcc_length = torch.Tensor(mfcc_length).to(DEVICE)
 
                 loss, output = model(feat_emb,ge2e_emb,mfcc_emb,labels,length,mfcc_length)
                 pred_label = torch.argmax(output,dim = 1)
