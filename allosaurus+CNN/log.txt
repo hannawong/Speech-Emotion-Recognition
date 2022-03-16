@@ -1,602 +1,302 @@
 ==============================epoch: 0==============================>
-loss: 1.662458856900533
-unweighted test accuracy0.4055433523318917
-weighted test accuracy0.3437156284371563
-unweighted test accuracy0.3777748857297207
-weighted test accuracy0.49997500124993743
-==============================epoch: 1==============================>
-loss: 1.3168661726845636
-unweighted test accuracy0.4722093523385582
-weighted test accuracy0.4687031296870313
-unweighted test accuracy0.42777438573472054
-weighted test accuracy0.5468476576171191
-==============================epoch: 2==============================>
-loss: 0.9924074742529128
-unweighted test accuracy0.5333196671644224
-weighted test accuracy0.5624437556244376
-unweighted test accuracy0.48161997153944514
-weighted test accuracy0.5937203139843007
-==============================epoch: 3==============================>
-loss: 0.7146891951560974
-unweighted test accuracy0.6222072968128171
-weighted test accuracy0.6874312568743126
-unweighted test accuracy0.6049090180065442
-weighted test accuracy0.687465626718664
-==============================epoch: 4==============================>
-loss: 0.44443047046661377
-unweighted test accuracy0.8166429453853269
-weighted test accuracy0.7811718828117188
-unweighted test accuracy0.7101424522094292
+loss: 1.2504582338862948
+unweighted test accuracy0.6666477785036707
+weighted test accuracy0.624937506249375
+unweighted test accuracy0.7089924295942761
 weighted test accuracy0.7499625018749062
-==============================epoch: 5==============================>
-loss: 0.20677067008283403
-unweighted test accuracy0.8610867602095243
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.7854620851711366
+==============================epoch: 1==============================>
+loss: 0.4962995648384094
+unweighted test accuracy0.766643445380327
+weighted test accuracy0.6874312568743126
+unweighted test accuracy0.7801454896377286
 weighted test accuracy0.8124593770311483
-==============================epoch: 6==============================>
-loss: 0.08790911154614554
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.772321183850664
+==============================epoch: 2==============================>
+loss: 0.22947039869096544
+unweighted test accuracy0.7277580933295348
+weighted test accuracy0.7186781321867813
+unweighted test accuracy0.7703416257388885
 weighted test accuracy0.7968351582420878
-==============================epoch: 7==============================>
-loss: 0.04950434797339969
-unweighted test accuracy0.8555310750287218
+==============================epoch: 3==============================>
+loss: 0.11230961812867059
+unweighted test accuracy0.7999792229762629
 weighted test accuracy0.8124187581241876
-unweighted test accuracy0.7861032677368437
-weighted test accuracy0.8280835958202089
+unweighted test accuracy0.8522850134846744
+weighted test accuracy0.85933203339833
+==============================epoch: 4==============================>
+loss: 0.05953317590885692
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8651054276866166
+weighted test accuracy0.8749562521873906
+==============================epoch: 5==============================>
+loss: 0.03807397621373335
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8817719276882833
+weighted test accuracy0.8905804709764511
+==============================epoch: 6==============================>
+loss: 0.027214705737100706
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8373281128640859
+weighted test accuracy0.85933203339833
+==============================epoch: 7==============================>
+loss: 0.01970237224466271
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.84843892768495
+weighted test accuracy0.85933203339833
 ==============================epoch: 8==============================>
-loss: 0.022762357050346002
-unweighted test accuracy0.8388645750270552
-weighted test accuracy0.7811718828117188
-unweighted test accuracy0.7522860134746746
-weighted test accuracy0.7655867206639667
-==============================epoch: 9==============================>
-loss: 0.023451757669034932
-unweighted test accuracy0.8388645750270552
-weighted test accuracy0.7811718828117188
-unweighted test accuracy0.8176450625593169
-weighted test accuracy0.8437078146092695
-==============================epoch: 10==============================>
-loss: 0.006139132427051663
-unweighted test accuracy0.8277537602061912
-weighted test accuracy0.7811718828117188
-unweighted test accuracy0.8137989767595922
-weighted test accuracy0.8437078146092695
-==============================epoch: 11==============================>
-loss: 0.003096832169426812
+loss: 0.015859411511984136
 unweighted test accuracy0.8833083898512526
 weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 12==============================>
-loss: 0.0024664580252849394
-unweighted test accuracy0.8999748898529193
+unweighted test accuracy0.8522850134846744
+weighted test accuracy0.85933203339833
+==============================epoch: 9==============================>
+loss: 0.013417304596967168
+unweighted test accuracy0.9110857046737834
 weighted test accuracy0.8749125087491251
-unweighted test accuracy0.8527692677435104
+unweighted test accuracy0.8749092915854564
 weighted test accuracy0.8905804709764511
-==============================epoch: 13==============================>
-loss: 0.001849445294485324
-unweighted test accuracy0.8999748898529193
+==============================epoch: 10==============================>
+loss: 0.011207592052718004
+unweighted test accuracy0.9110857046737834
 weighted test accuracy0.8749125087491251
-unweighted test accuracy0.8361027677418437
+unweighted test accuracy0.8582427915837898
 weighted test accuracy0.8749562521873906
+==============================epoch: 11==============================>
+loss: 0.009843435966306262
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8374097186638679
+weighted test accuracy0.85933203339833
+==============================epoch: 12==============================>
+loss: 0.008528294559154246
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8651054276866166
+weighted test accuracy0.8749562521873906
+==============================epoch: 13==============================>
+loss: 0.007595058013167646
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8749092915854564
+weighted test accuracy0.8905804709764511
 ==============================epoch: 14==============================>
-loss: 0.0014886686112731695
-unweighted test accuracy0.8999748898529193
+loss: 0.006872457607338826
+unweighted test accuracy0.9110857046737834
 weighted test accuracy0.8749125087491251
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
+unweighted test accuracy0.8749092915854564
+weighted test accuracy0.8905804709764511
 ==============================epoch: 15==============================>
-loss: 0.0013272081527652012
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
+loss: 0.006426362501871254
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8553015637877768
+weighted test accuracy0.85933203339833
 ==============================epoch: 16==============================>
-loss: 0.0011582716704449719
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
+loss: 0.005701924182681574
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8651054276866166
+weighted test accuracy0.8749562521873906
 ==============================epoch: 17==============================>
-loss: 0.0010547164969870613
-unweighted test accuracy0.8999748898529193
-weighted test accuracy0.8749125087491251
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
+loss: 0.005354780677912964
+unweighted test accuracy0.8277565377987938
+weighted test accuracy0.8436656334366563
+unweighted test accuracy0.8651054276866166
+weighted test accuracy0.8749562521873906
 ==============================epoch: 18==============================>
-loss: 0.0009437105553742084
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
+loss: 0.004830040658513705
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8651054276866166
+weighted test accuracy0.8749562521873906
 ==============================epoch: 19==============================>
-loss: 0.0008536976011883882
-unweighted test accuracy0.8999748898529193
+loss: 0.004489374191810687
+unweighted test accuracy0.9110857046737834
 weighted test accuracy0.8749125087491251
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
+unweighted test accuracy0.8651054276866166
+weighted test accuracy0.8749562521873906
 ==============================epoch: 20==============================>
-loss: 0.0007962036502754523
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
+loss: 0.004241240314311451
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.84843892768495
+weighted test accuracy0.85933203339833
 ==============================epoch: 21==============================>
-loss: 0.000732087750091321
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
-==============================epoch: 22==============================>
-loss: 0.000685773039650586
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
-==============================epoch: 23==============================>
-loss: 0.0006226430349569353
-unweighted test accuracy0.8999748898529193
+loss: 0.003816129510394401
+unweighted test accuracy0.9110857046737834
 weighted test accuracy0.8749125087491251
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 24==============================>
-loss: 0.000595976336626336
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8902688406650988
+unweighted test accuracy0.9082422915887897
 weighted test accuracy0.9218289085545722
-==============================epoch: 25==============================>
-loss: 0.0005391896831699543
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
-==============================epoch: 26==============================>
-loss: 0.0005216120367145373
-unweighted test accuracy0.8999748898529193
+==============================epoch: 22==============================>
+loss: 0.0037654556023577848
+unweighted test accuracy0.9110857046737834
 weighted test accuracy0.8749125087491251
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
+unweighted test accuracy0.8749092915854564
+weighted test accuracy0.8905804709764511
+==============================epoch: 23==============================>
+loss: 0.0032616975303325388
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8454223773818477
+weighted test accuracy0.85933203339833
+==============================epoch: 24==============================>
+loss: 0.0032222784615846146
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8651054276866166
+weighted test accuracy0.8749562521873906
+==============================epoch: 25==============================>
+loss: 0.002963784163714283
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8749092915854564
+weighted test accuracy0.8905804709764511
+==============================epoch: 26==============================>
+loss: 0.00277717643055237
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8749092915854564
+weighted test accuracy0.8905804709764511
 ==============================epoch: 27==============================>
-loss: 0.0005054054781794548
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
+loss: 0.002644514082930982
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8651054276866166
+weighted test accuracy0.8749562521873906
 ==============================epoch: 28==============================>
-loss: 0.00045236114076235227
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
+loss: 0.0025398184726428655
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8817719276882833
+weighted test accuracy0.8905804709764511
 ==============================epoch: 29==============================>
-loss: 0.00043127769539650116
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
+loss: 0.0023950433436160288
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8915757915871231
 weighted test accuracy0.9062046897655116
 ==============================epoch: 30==============================>
-loss: 0.0003915925788330949
-unweighted test accuracy0.8721975750303885
+loss: 0.00223625012828658
+unweighted test accuracy0.8833083898512526
 weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8902688406650988
-weighted test accuracy0.9218289085545722
+unweighted test accuracy0.8582427915837898
+weighted test accuracy0.8749562521873906
 ==============================epoch: 31==============================>
-loss: 0.00039892170591176383
-unweighted test accuracy0.8555310750287219
-weighted test accuracy0.8124187581241876
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
+loss: 0.0021174504654482007
+unweighted test accuracy0.8944192046721167
+weighted test accuracy0.8436656334366563
+unweighted test accuracy0.8749092915854564
+weighted test accuracy0.8905804709764511
 ==============================epoch: 32==============================>
-loss: 0.000384378790234526
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8902688406650988
-weighted test accuracy0.9218289085545722
+loss: 0.0020768691966724065
+unweighted test accuracy0.866641889849586
+weighted test accuracy0.8124187581241876
+unweighted test accuracy0.8620888773835143
+weighted test accuracy0.8749562521873906
 ==============================epoch: 33==============================>
-loss: 0.00036533835615652305
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
+loss: 0.0019042014739372665
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8915757915871231
 weighted test accuracy0.9062046897655116
 ==============================epoch: 34==============================>
-loss: 0.00034000252425256703
-unweighted test accuracy0.8721975750303885
+loss: 0.001809747954313126
+unweighted test accuracy0.8833083898512526
 weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
-weighted test accuracy0.9062046897655116
-==============================epoch: 35==============================>
-loss: 0.00033104281950121123
-unweighted test accuracy0.8555310750287219
-weighted test accuracy0.8124187581241876
-unweighted test accuracy0.8569358406617655
+unweighted test accuracy0.8817719276882833
 weighted test accuracy0.8905804709764511
-==============================epoch: 36==============================>
-loss: 0.0002970344374059803
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
+==============================epoch: 35==============================>
+loss: 0.0017275283656393488
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8915757915871231
 weighted test accuracy0.9062046897655116
+==============================epoch: 36==============================>
+loss: 0.0016488708529828323
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8749092915854564
+weighted test accuracy0.8905804709764511
 ==============================epoch: 37==============================>
-loss: 0.00029325056918120634
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8637984767645923
+loss: 0.001602625429061138
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.878755377385181
 weighted test accuracy0.8905804709764511
 ==============================epoch: 38==============================>
-loss: 0.00027950536847735447
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 39==============================>
-loss: 0.00026926554629527446
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634322
+loss: 0.0015752743476898307
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8915757915871231
 weighted test accuracy0.9062046897655116
-==============================epoch: 40==============================>
-loss: 0.000261247563887284
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
+==============================epoch: 39==============================>
+loss: 0.0014840140033306347
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8749092915854564
 weighted test accuracy0.8905804709764511
+==============================epoch: 40==============================>
+loss: 0.001423764631100413
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8651054276866166
+weighted test accuracy0.8749562521873906
 ==============================epoch: 41==============================>
-loss: 0.00025039278908580955
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8637984767645923
+loss: 0.0013259546119823223
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8749092915854564
 weighted test accuracy0.8905804709764511
 ==============================epoch: 42==============================>
-loss: 0.0002402871355621351
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8637984767645924
+loss: 0.0013760174171895618
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8817719276882833
 weighted test accuracy0.8905804709764511
 ==============================epoch: 43==============================>
-loss: 0.00023601278533331223
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
+loss: 0.0012331717686417203
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8915757915871231
+weighted test accuracy0.9062046897655116
 ==============================epoch: 44==============================>
-loss: 0.00021917772149511924
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
+loss: 0.0012371252588410345
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.84843892768495
+weighted test accuracy0.85933203339833
 ==============================epoch: 45==============================>
-loss: 0.00021424975097438114
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
+loss: 0.0011919676390890446
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8915757915871231
+weighted test accuracy0.9062046897655116
 ==============================epoch: 46==============================>
-loss: 0.00020509084020482583
-unweighted test accuracy0.8555310750287219
-weighted test accuracy0.8124187581241876
-unweighted test accuracy0.8471319767629257
-weighted test accuracy0.8749562521873906
+loss: 0.0011251459105147256
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.84843892768495
+weighted test accuracy0.85933203339833
 ==============================epoch: 47==============================>
-loss: 0.00020611877294464243
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
+loss: 0.001076513125250737
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8817719276882833
 weighted test accuracy0.8905804709764511
 ==============================epoch: 48==============================>
-loss: 0.00019365164270210598
-unweighted test accuracy0.8555310750287219
-weighted test accuracy0.8124187581241876
-unweighted test accuracy0.8569358406617655
+loss: 0.0010586253677805264
+unweighted test accuracy0.9110857046737834
+weighted test accuracy0.8749125087491251
+unweighted test accuracy0.8817719276882833
 weighted test accuracy0.8905804709764511
 ==============================epoch: 49==============================>
-loss: 0.00018765070934831683
-unweighted test accuracy0.8721975750303885
+loss: 0.0010017791969908609
+unweighted test accuracy0.8833083898512526
 weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8471319767629257
-weighted test accuracy0.8749562521873906
-==============================epoch: 50==============================>
-loss: 0.00018388923975483826
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634321
+unweighted test accuracy0.8915757915871231
 weighted test accuracy0.9062046897655116
-==============================epoch: 51==============================>
-loss: 0.00017531923044265973
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 52==============================>
-loss: 0.0001645500176689691
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 53==============================>
-loss: 0.00015989895715999106
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634322
-weighted test accuracy0.9062046897655116
-==============================epoch: 54==============================>
-loss: 0.0001535036442672006
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634322
-weighted test accuracy0.9062046897655116
-==============================epoch: 55==============================>
-loss: 0.00015545284097445093
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 56==============================>
-loss: 0.00014396117734981494
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 57==============================>
-loss: 0.0001466948645732676
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 58==============================>
-loss: 0.00013920929793837585
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634322
-weighted test accuracy0.9062046897655116
-==============================epoch: 59==============================>
-loss: 0.0001338943159983804
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 60==============================>
-loss: 0.00012888549422819374
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 61==============================>
-loss: 0.00012716682572823224
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 62==============================>
-loss: 0.00012432497654420635
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 63==============================>
-loss: 0.00011752282524765987
-unweighted test accuracy0.8555310750287219
-weighted test accuracy0.8124187581241876
-unweighted test accuracy0.8471319767629257
-weighted test accuracy0.8749562521873906
-==============================epoch: 64==============================>
-loss: 0.00011535668292910689
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 65==============================>
-loss: 0.00011415280944978197
-unweighted test accuracy0.8555310750287219
-weighted test accuracy0.8124187581241876
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 66==============================>
-loss: 0.00011079861481751625
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 67==============================>
-loss: 0.00010918778571067378
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 68==============================>
-loss: 0.00010670241883619585
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 69==============================>
-loss: 0.00010440295348720004
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 70==============================>
-loss: 9.72158425914434e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 71==============================>
-loss: 9.70187280068381e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 72==============================>
-loss: 9.727261850558635e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 73==============================>
-loss: 9.636660090311327e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 74==============================>
-loss: 8.932616684534069e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 75==============================>
-loss: 9.175695029423675e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 76==============================>
-loss: 8.906177148067702e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 77==============================>
-loss: 8.578312635007832e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 78==============================>
-loss: 8.467142308493041e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 79==============================>
-loss: 7.964629993592907e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8736023406634322
-weighted test accuracy0.9062046897655116
-==============================epoch: 80==============================>
-loss: 8.175361694561111e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 81==============================>
-loss: 7.760697189951316e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 82==============================>
-loss: 7.692665611911152e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 83==============================>
-loss: 7.361434311153264e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 84==============================>
-loss: 7.28744251116748e-05
-unweighted test accuracy0.8555310750287219
-weighted test accuracy0.8124187581241876
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 85==============================>
-loss: 7.128390886161166e-05
-unweighted test accuracy0.8555310750287219
-weighted test accuracy0.8124187581241876
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 86==============================>
-loss: 6.837796132054387e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 87==============================>
-loss: 6.983754792599939e-05
-unweighted test accuracy0.8555310750287219
-weighted test accuracy0.8124187581241876
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 88==============================>
-loss: 6.798805892079447e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 89==============================>
-loss: 6.737749693760027e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 90==============================>
-loss: 6.484628344575565e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 91==============================>
-loss: 6.484013162359285e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 92==============================>
-loss: 6.227574421144609e-05
-unweighted test accuracy0.8555310750287219
-weighted test accuracy0.8124187581241876
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 93==============================>
-loss: 6.264488143238446e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 94==============================>
-loss: 5.951746465547735e-05
-unweighted test accuracy0.8555310750287219
-weighted test accuracy0.8124187581241876
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 95==============================>
-loss: 6.0195934363744324e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8471319767629257
-weighted test accuracy0.8749562521873906
-==============================epoch: 96==============================>
-loss: 5.7524011127599e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 97==============================>
-loss: 5.7740720270279176e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.8569358406617655
-weighted test accuracy0.8905804709764511
-==============================epoch: 98==============================>
-loss: 5.60849722306658e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-==============================epoch: 99==============================>
-loss: 5.486061612221723e-05
-unweighted test accuracy0.8721975750303885
-weighted test accuracy0.8436656334366563
-unweighted test accuracy0.840269340660099
-weighted test accuracy0.8749562521873906
-unweighted test accuracy0.8527692677435104
+unweighted test accuracy0.8817719276882833
 weighted test accuracy0.8905804709764511

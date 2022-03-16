@@ -10,9 +10,9 @@ from SER.utils.utils import save_checkpoint
 from SER.parameters import SAVED_CHECKPOINTS
 
 MAX_LEN = 200
-WAV_PATH = "/data1/jiayu_xiao/project/wzh/data/path_to_wavs/"
 ALLO_EMB_PATH = "/data1/jiayu_xiao/project/wzh/data/allo_embedding/"
 GE2E_EMB_PATH = "../data/GE2E/"
+GE2E_INPUT_PATH = "../data/GE2E_input/"
 MFCC_EMB_PATH = "/data1/jiayu_xiao/project/wzh/data/mfcc_embeddings/"
 
 def print_progress(scores):
@@ -74,6 +74,28 @@ def tensorize_triples(args,audio_files, labels, bsize): ##transform sentence int
             ge2e_emb = torch.zeros((1,256))
         GE2E_embs.append(ge2e_emb)
     GE2E_embedding = torch.stack(GE2E_embs,axis = 0)
+    '''   
+    GE2E_inputs = []
+    GE2E_length = []
+    for file in audio_files:
+        ge2e_input_emb = pkl.load(open(GE2E_INPUT_PATH+"wav_"+file.split("/")[-1][:-4]+".npy","rb"))
+        ge2e_input_emb = ge2e_input_emb.squeeze()
+
+        if ge2e_input_emb.shape[0] >= MAX_LEN:
+            ge2e_input_emb = ge2e_input_emb[:MAX_LEN,:]
+            GE2E_length.append(MAX_LEN-1)
+        else:
+            GE2E_length.append(ge2e_input_emb.shape[0]-1)
+            zero = torch.zeros((MAX_LEN-ge2e_input_emb.shape[0], ge2e_input_emb.shape[1]))
+            ge2e_input_emb = torch.cat((ge2e_input_emb, zero), dim=0)
+            
+        ge2e_input_emb.append(ge2e_input_emb)
+    ge2e_input_embedding = torch.stack(ge2e_input_emb,axis = 0) ##len,emb_size
+    print(ge2e_input_embedding.shape)
+    print(ge2e_input_embedding)
+    exit()
+    '''
+
 
     mfcc_embs = []
     mfcc_length = []

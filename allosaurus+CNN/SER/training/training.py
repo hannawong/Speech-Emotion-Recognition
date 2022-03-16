@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score
 from SER.utils.amp import MixedPrecisionManager
 from SER.training.pretrainbatcher import PretrainBatcher
 from SER.training.batcher_german import PretrainBatcher_ge
+from SER.training.batcher_persian import PretrainBatcher_pe
 from SER.modeling.ser_model import SER_MODEL
 from SER.utils.utils import print_message
 from SER.training.utils import split_train_val_test_german
@@ -20,21 +21,23 @@ def train(args):
     random.seed(12345)
     np.random.seed(12345)
     torch.manual_seed(12345)
+
     if args.langs == "en":
         ser_model = SER_MODEL(args,audio_maxlen=200,num_labels=4)
     if args.langs == "ge":
         ser_model = SER_MODEL(args,audio_maxlen=200,num_labels=6)
         global CLASS_NUM
         CLASS_NUM = 6
+    if args.langs == "pe":
+        ser_model = SER_MODEL(args,audio_maxlen=200,num_labels=6)
+        CLASS_NUM = 6
 
-    
 
     TEST_PATH = args.triples[:-10]+".test.csv"
     VAL_PATH = args.triples[:-10]+".val.csv"
 
-    if args.langs == "ge":
+    if args.langs == "ge" or args.langs == "pe":
         args.triples, TEST_PATH, VAL_PATH = split_train_val_test_german(args.triples)
-        
 
     best_model = None
     best_uacc = 0.0
@@ -43,7 +46,7 @@ def train(args):
 
     amp = MixedPrecisionManager(args.amp)
     optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()),lr = args.lr,weight_decay=1e-5)
-    scheduler = StepLR(optimizer, step_size=100, gamma=0.5)
+    scheduler = StepLR(optimizer, step_size=2000, gamma=0.5)
 
     def training(step):
         ser_model.train()
@@ -51,7 +54,8 @@ def train(args):
             reader = PretrainBatcher(args, args.triples,(0 if args.rank == -1 else args.rank), args.nranks)
         if args.langs == "ge":
             reader = PretrainBatcher_ge(args,args.triples,(0 if args.rank == -1 else args.rank), args.nranks)
-
+        if args.langs == "pe":
+            reader = PretrainBatcher_pe(args,args.triples,(0 if args.rank == -1 else args.rank), args.nranks)
         train_loss = 0.0
         start_batch_idx = 0
 
@@ -82,7 +86,7 @@ def train(args):
 
             
     step = 0
-    for epoch in range(100):
+    for epoch in range(50):
         scheduler.step()
         print('Epoch:', epoch,'LR:', scheduler.get_lr())
         LOG.write("="*30+"epoch: "+str(epoch)+"="*30+">"+"\n")
@@ -104,11 +108,15 @@ def train(args):
     evaluate(args,best_model,TEST_PATH)
 
 def evaluate(args,model,path):
+    print(CLASS_NUM,"=========")
     print("begin evaluate...")
     if args.langs == "en":
         reader = PretrainBatcher(args, path,(0 if args.rank == -1 else args.rank), args.nranks)
     if args.langs == "ge":
         reader = PretrainBatcher_ge(args, path,(0 if args.rank == -1 else args.rank), args.nranks)
+
+    if args.langs == "pe":
+        reader = PretrainBatcher_pe(args, path,(0 if args.rank == -1 else args.rank), args.nranks)
     start_batch_idx = 0
     class_tot = [0]*CLASS_NUM 
     class_correct = [0]*CLASS_NUM
@@ -141,9 +149,9 @@ def evaluate(args,model,path):
     weight_acc = []
     for j in range(CLASS_NUM):
         unweight_acc.append(class_correct[j]/(class_tot[j]+0.0001))
-        weight_acc.append((class_correct[j]/class_tot[j])*(class_tot[j]/sum(class_tot)))
+        weight_acc.append((class_correct[j]/(class_tot[j]+0.0001))*(class_tot[j]/(sum(class_tot)+0.0001)))
     LOG.write("unweighted test accuracy"+str(sum(unweight_acc)/CLASS_NUM)+"\n")
     print("UA= ",sum(unweight_acc)/CLASS_NUM)              
     LOG.write("weighted test accuracy"+str(tot_acc/(i+0.0001))+"\n")
     print("weighted test accuracy"+str(tot_acc/(i+0.0001))+"\n")
-    return sum(unweight_acc)/CLASS_NUM , tot_acc/i
+    return sum(unweight_acc)/CLASS_NUM , tot_acc/(i+0.0001)

@@ -3,40 +3,78 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 import numpy as np
+from SER.modeling.GE2E_model import SpeakerEncoder
+
+state_fpath = "/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/encoder.pt"
+
 
 class SER_MODEL(nn.Module):
-    def __init__(self, args,audio_maxlen, num_labels, hidden_size = 64):
+    def __init__(self, args,audio_maxlen, num_labels, hidden_size = 128):
+        if args.langs == "pe":
+            ALLO_CONV_SIZE = 64
+            ALLO_LSTM_SIZE = 64
+            ALLO_ATTN_SIZE = 64
+            ALLO_LSTM_NUM = 2
+
+            MFCC_CONV_SIZE = 32
+            MFCC_LSTM_SIZE = 64
+            MFCC_LSTM_NUM = 1
+
+            DROP_OUT = 0.05
+            hidden_size = 400
+        if args.langs == "ge" or args.langs == "en":
+            ALLO_CONV_SIZE = 128
+            ALLO_LSTM_SIZE = 128
+            ALLO_ATTN_SIZE = 128
+            ALLO_LSTM_NUM = 1
+
+            MFCC_CONV_SIZE = 32
+            MFCC_LSTM_SIZE = 64
+            MFCC_LSTM_NUM = 1
+
+            DROP_OUT = 0.1
+            hidden_size = 256
 
         super(SER_MODEL, self).__init__()
         self.audio_maxlen = audio_maxlen
         self.num_labels = num_labels
         self.args = args
         #########  Allosaurus feature   ##########
-        self.conv1d_1 = nn.Conv1d(in_channels=230, out_channels=128, kernel_size=3,padding = "same")
-        self.conv1d_2 = nn.Conv1d(in_channels=230, out_channels=128, kernel_size=5,padding = "same")
-        self.lstm = nn.LSTM(128, 128, 1, bidirectional=True)
-        self.adaptor0 = nn.Linear(256,128)
-        self.Q_layer = nn.Linear(128,128)
-        self.K_layer = nn.Linear(128,128)
-        self.V_layer = nn.Linear(128,128)
+        self.conv1d_1 = nn.Conv1d(in_channels=230, out_channels=ALLO_CONV_SIZE, kernel_size=3,padding = "same")
+        self.conv1d_2 = nn.Conv1d(in_channels=230, out_channels=ALLO_CONV_SIZE, kernel_size=5,padding = "same")
+        self.lstm = nn.LSTM(ALLO_CONV_SIZE, ALLO_LSTM_SIZE, ALLO_LSTM_NUM, bidirectional=True)
+        self.Q_layer = nn.Linear(ALLO_LSTM_SIZE*2,ALLO_ATTN_SIZE)
+        self.K_layer = nn.Linear(ALLO_LSTM_SIZE*2,ALLO_ATTN_SIZE)
+        self.V_layer = nn.Linear(ALLO_LSTM_SIZE*2,ALLO_ATTN_SIZE)
 
         ############# for MFCC ###############
-        self.conv1d_1_mfcc = nn.Conv1d(in_channels=24, out_channels=24, kernel_size=3,padding = "same")
-        self.conv1d_2_mfcc = nn.Conv1d(in_channels=24, out_channels=24, kernel_size=5,padding = "same")
-        self.lstm_mfcc = nn.LSTM(24, 64, 1, bidirectional=True)
-        self.Q_layer_mfcc = nn.Linear(128,128)
-        self.K_layer_mfcc = nn.Linear(128,128)
-        self.V_layer_mfcc = nn.Linear(128,128)
+        self.conv1d_1_mfcc = nn.Conv1d(in_channels=24, out_channels=MFCC_CONV_SIZE, kernel_size=3,padding = "same")
+        self.conv1d_2_mfcc = nn.Conv1d(in_channels=24, out_channels=MFCC_CONV_SIZE, kernel_size=5,padding = "same")
+        self.lstm_mfcc = nn.LSTM(MFCC_CONV_SIZE,MFCC_LSTM_SIZE, MFCC_LSTM_NUM, bidirectional=True)
+        self.Q_layer_mfcc = nn.Linear(MFCC_LSTM_SIZE*2,ALLO_ATTN_SIZE)
+        self.K_layer_mfcc = nn.Linear(MFCC_LSTM_SIZE*2,ALLO_ATTN_SIZE)
+        self.V_layer_mfcc = nn.Linear(MFCC_LSTM_SIZE*2,ALLO_ATTN_SIZE)
 
-        ########### for concat ##############
-        self.adaptor = nn.Linear(128,256)
-        self.adaptor1 = nn.Linear(128,256)
+        ############# for GE2E finetuning #############
+        '''
+        self.SpeakerEncoder = SpeakerEncoder("cpu","cpu")  ####small learning rate
+        checkpoint = torch.load(state_fpath, map_location='cpu')
+        self.SpeakerEncoder.load_state_dict(checkpoint["model_state"])
+        print(self.SpeakerEncoder.cuda())
+        '''
 
         ########## MLP ############
-        self.dense1 = nn.Linear(128*2, hidden_size*4)
-        self.bn = torch.nn.BatchNorm1d(hidden_size*4)
-        self.dropout = nn.Dropout(0.1)
-        self.dense2 = nn.Linear(hidden_size*4,hidden_size)
+        if args.GE2E:
+            self.dense1 = nn.Linear(256+ALLO_ATTN_SIZE, hidden_size*2)
+        else:
+            self.dense1 = nn.Linear(ALLO_ATTN_SIZE, hidden_size*2)
+        if args.only_GE2E:
+            self.dense1 = nn.Linear(256,hidden_size*2)
+        self.bn = torch.nn.BatchNorm1d(hidden_size*2)
+        self.bn1 = torch.nn.BatchNorm1d(hidden_size)
+        self.bn2 = torch.nn.BatchNorm1d(hidden_size//2)
+        self.dropout = nn.Dropout(DROP_OUT)
+        self.dense2 = nn.Linear(hidden_size*2,hidden_size)
         self.dense3 = nn.Linear(hidden_size,hidden_size // 2)
         self.out_proj = nn.Linear(hidden_size//2, num_labels)
 
@@ -107,7 +145,6 @@ class SER_MODEL(nn.Module):
         x1 = x1.permute(0,2,1)
         x = torch.add(x,x1)
         x,_ = self.lstm(x)
-        x = self.adaptor0(x)
         allo_hidden_state = self.self_attention_layer(x,length) ##[bz,128]
 
         ################## mfcc features ####################
@@ -121,24 +158,42 @@ class SER_MODEL(nn.Module):
         mfcc_hidden_state = self.self_attention_layer_mfcc(mfcc_x,mfcc_length) ##[bz,32]
         
         ############### combine mfcc and allosaurus ###########
-        if self.args.MFCC:
+        if self.args.MFCC and not self.args.no_Allo:
             mfcc_allo_hidden_state = torch.add(allo_hidden_state,mfcc_hidden_state)
-            mfcc_allo_hidden_state = self.adaptor(mfcc_allo_hidden_state)
+        elif not self.args.MFCC and not self.args.no_Allo:
+            mfcc_allo_hidden_state = allo_hidden_state
         else:
-            mfcc_allo_hidden_state = self.adaptor1(allo_hidden_state)
+            mfcc_allo_hidden_state = mfcc_hidden_state
         ############### add ge2e #####################
-        ge2e_emb = ge2e_emb.squeeze()
-        x = torch.add(mfcc_allo_hidden_state,ge2e_emb)
-
+        if self.args.GE2E:
+            ge2e_emb = ge2e_emb.squeeze()
+            x = torch.concat((mfcc_allo_hidden_state, ge2e_emb),1)
+        else:
+            x = mfcc_allo_hidden_state
+        
+        if self.args.only_GE2E:
+            x = ge2e_emb.squeeze()
+        if self.args.only_MFCC:
+            x = mfcc_hidden_state
         ############## MLP ################
         x = self.dense1(x)
         x = self.bn(x)
+        m = nn.Mish()
+        #x = F.gelu(x)
         x = torch.tanh(x)
+        if self.args.langs == "pe":
+            x = m(x)
         x = self.dropout(x)
         x = self.dense2(x)
+        x = self.bn1(x)
+        
         x = F.relu(x)
+        if self.args.langs == "pe":
+            x = F.gelu(x)
+        x = self.dropout(x)
         x = self.dense3(x)
-        x = F.relu(x)
+        x = self.bn2(x)
+        x = F.gelu(x)
         x = self.out_proj(x)
         loss_fct = torch.nn.CrossEntropyLoss()
         label = label.long()

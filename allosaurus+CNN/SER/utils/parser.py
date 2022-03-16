@@ -44,7 +44,9 @@ class Arguments():
         self.add_argument('--amp', dest='amp', default=False, action='store_true')
         self.add_argument('--GE2E', dest='GE2E', default=False, action='store_true')
         self.add_argument('--MFCC', dest='MFCC', default=False, action='store_true')
-
+        self.add_argument('--only_GE2E',dest='only_GE2E', default=False, action='store_true')
+        self.add_argument('--only_MFCC',dest='only_MFCC', default=False, action='store_true')
+        self.add_argument('--no_Allo',dest='no_Allo', default=False, action='store_true')
     def add_model_inference_parameters(self):
         self.add_argument('--checkpoint', dest='checkpoint', required=True)
         self.add_argument('--bsize', dest='bsize', default=128, type=int)
