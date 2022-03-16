@@ -2,11 +2,12 @@
 
 ### Prerequisite
 use the following command to install packages:
-'''sh
+
+```sh
 pip install mlflow
 pip install ujson
 pip install transformers
-'''
+```
 The torch version is `1.10.0+cu111`.
 
 ### Extract Features 
