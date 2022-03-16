@@ -5,8 +5,8 @@ import math
 import numpy as np
 from SER.modeling.GE2E_model import SpeakerEncoder
 
-state_fpath = "/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/encoder.pt"
-
+#state_fpath = "/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/encoder.pt"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 class SER_MODEL(nn.Module):
     def __init__(self, args,audio_maxlen, num_labels, hidden_size = 128):
@@ -105,7 +105,7 @@ class SER_MODEL(nn.Module):
 
         attention_mask = self.get_attention_mask(lstm_output,length) ##can only attend to hidden state that really exist
         adder = (1.0 - attention_mask.long()) * -10000.0  ##-infty, [batchsize,150]
-        adder = torch.unsqueeze(adder,axis = 1).cuda()
+        adder = torch.unsqueeze(adder,axis = 1).to(DEVICE)
         attention_scores += adder
 
         m = nn.Softmax(dim=2)
@@ -126,7 +126,7 @@ class SER_MODEL(nn.Module):
 
         attention_mask = self.get_attention_mask(lstm_output,length) ##can only attend to hidden state that really exist
         adder = (1.0 - attention_mask.long()) * -10000.0  ##-infty, [batchsize,150]
-        adder = torch.unsqueeze(adder,axis = 1).cuda()
+        adder = torch.unsqueeze(adder,axis = 1).to(DEVICE)
         attention_scores += adder
 
         m = nn.Softmax(dim=2)

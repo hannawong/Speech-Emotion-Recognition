@@ -10,10 +10,11 @@ from SER.utils.utils import save_checkpoint
 from SER.parameters import SAVED_CHECKPOINTS
 
 MAX_LEN = 200
-ALLO_EMB_PATH = "/data1/jiayu_xiao/project/wzh/data/allo_embedding/"
+WAV_PATH = "/content/drive/MyDrive/path_to_wavs/"
+ALLO_EMB_PATH = "/content/drive/MyDrive/allo_embedding/"
 GE2E_EMB_PATH = "../data/GE2E/"
+MFCC_EMB_PATH = "/content/drive/MyDrive/mfcc_embeddings/"
 GE2E_INPUT_PATH = "../data/GE2E_input/"
-MFCC_EMB_PATH = "/data1/jiayu_xiao/project/wzh/data/mfcc_embeddings/"
 
 def print_progress(scores):
     positive_avg, negative_avg = round(scores[:, 0].mean().item(), 2), round(scores[:, 1].mean().item(), 2)
