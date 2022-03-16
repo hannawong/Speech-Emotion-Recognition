@@ -15,8 +15,11 @@ The torch version is `1.10.0+cu111`.
 #### 2. Download Dataset and Features
 
 Wav files: https://drive.google.com/drive/folders/12V4A78u_XOp7vXlUrF5vweXEF9nb4btJ?usp=sharing
+
 Allosaurus features: https://drive.google.com/drive/folders/1YDjsl05ubArpvo4kk9yzXjnbexXgInHP?usp=sharing
+
 GE2E features is in data/GE2E
+
 MFCC features: https://drive.google.com/drive/folders/12aaC-n4o0qXSL53rRFcLWqx6ar1J4iUs?usp=sharing
 
 
