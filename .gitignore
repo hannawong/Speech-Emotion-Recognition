@@ -8,3 +8,4 @@ __pycache__/
 paper_slides/
 logs/
 MSMARCO-psg/
+checkpoint.dnn

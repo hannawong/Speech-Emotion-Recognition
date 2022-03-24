@@ -4,25 +4,29 @@ import torch.nn.functional as F
 import math
 import numpy as np
 from SER.modeling.GE2E_model import SpeakerEncoder
+from SER.modeling.audio import *
+from SER.modeling.inference import *
+import pickle as pkl
+dic = {}
 
-#state_fpath = "/data1/jiayu_xiao/project/wzh_recommendation/Speech-Emotion-Recognition/encoder.pt"
+state_fpath = "/content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/SER/modeling/encoder.pt"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 class SER_MODEL(nn.Module):
     def __init__(self, args,audio_maxlen, num_labels, hidden_size = 128):
         if args.langs == "pe":
-            ALLO_CONV_SIZE = 64
-            ALLO_LSTM_SIZE = 64
-            ALLO_ATTN_SIZE = 64
+            ALLO_CONV_SIZE = 32
+            ALLO_LSTM_SIZE = 32
+            ALLO_ATTN_SIZE = 32
             ALLO_LSTM_NUM = 2
 
             MFCC_CONV_SIZE = 32
             MFCC_LSTM_SIZE = 64
             MFCC_LSTM_NUM = 1
 
-            DROP_OUT = 0.05
-            hidden_size = 400
-        if args.langs == "ge" or args.langs == "en":
+            DROP_OUT = 0.01
+            hidden_size = 512
+        if args.langs == "ge": 
             ALLO_CONV_SIZE = 128
             ALLO_LSTM_SIZE = 128
             ALLO_ATTN_SIZE = 128
@@ -32,8 +36,21 @@ class SER_MODEL(nn.Module):
             MFCC_LSTM_SIZE = 64
             MFCC_LSTM_NUM = 1
 
-            DROP_OUT = 0.1
+            DROP_OUT = 0.05
             hidden_size = 256
+        if args.langs == "en":
+            ALLO_CONV_SIZE = 128
+            ALLO_LSTM_SIZE = 128
+            ALLO_ATTN_SIZE = 128
+            ALLO_LSTM_NUM = 1
+
+            MFCC_CONV_SIZE = 32
+            MFCC_LSTM_SIZE = 64
+            MFCC_LSTM_NUM = 1
+
+            DROP_OUT = 0.05
+            hidden_size = 256
+
 
         super(SER_MODEL, self).__init__()
         self.audio_maxlen = audio_maxlen
@@ -56,12 +73,12 @@ class SER_MODEL(nn.Module):
         self.V_layer_mfcc = nn.Linear(MFCC_LSTM_SIZE*2,ALLO_ATTN_SIZE)
 
         ############# for GE2E finetuning #############
-        '''
+        
         self.SpeakerEncoder = SpeakerEncoder("cpu","cpu")  ####small learning rate
         checkpoint = torch.load(state_fpath, map_location='cpu')
         self.SpeakerEncoder.load_state_dict(checkpoint["model_state"])
-        print(self.SpeakerEncoder.cuda())
-        '''
+        self.SpeakerEncoder = self.SpeakerEncoder.to(DEVICE)
+      
 
         ########## MLP ############
         if args.GE2E:
@@ -78,9 +95,9 @@ class SER_MODEL(nn.Module):
         self.dense3 = nn.Linear(hidden_size,hidden_size // 2)
         self.out_proj = nn.Linear(hidden_size//2, num_labels)
 
-    def forward(self, feat_emb, ge2e_emb,mfcc_emb,label,length,mfcc_length):
+    def forward(self, feat_emb, ge2e_emb,mfcc_emb,label,length,mfcc_length,audio_files):
         
-        return self.classification_score(feat_emb,ge2e_emb,mfcc_emb,label,length,mfcc_length)
+        return self.classification_score(feat_emb,ge2e_emb,mfcc_emb,label,length,mfcc_length,audio_files)
 
 
     def get_attention_mask(self,lstm_output,length):
@@ -135,7 +152,7 @@ class SER_MODEL(nn.Module):
         return context_layer.squeeze()
 
 
-    def classification_score(self,feat_emb,ge2e_emb,mfcc_emb,label,length,mfcc_length):
+    def classification_score(self,feat_emb,ge2e_emb,mfcc_emb,label,length,mfcc_length,audio_files):
         
         ########## allosaurus features #############
         feat_emb = feat_emb.permute(0, 2, 1)
@@ -166,7 +183,21 @@ class SER_MODEL(nn.Module):
             mfcc_allo_hidden_state = mfcc_hidden_state
         ############### add ge2e #####################
         if self.args.GE2E:
-            ge2e_emb = ge2e_emb.squeeze()
+            ge2e_emb = ge2e_emb.squeeze()  ### hard-encode ge2e_emb
+            
+            ge2e_emb = []
+            for i in range(len(audio_files)):
+              if audio_files[i] not in dic:
+                wav = preprocess_wav("/content/drive/MyDrive/path_to_wavs/"+audio_files[i].split("/")[-1])
+                dic[audio_files[i]] = wav
+              else:
+                wav = dic[audio_files[i]]
+              emb = embed_utterance(wav,self.SpeakerEncoder.to(DEVICE))
+              ge2e_emb.append(torch.Tensor(emb))
+            ge2e_emb = torch.stack(ge2e_emb, axis = 0)
+            ge2e_emb = ge2e_emb.to(DEVICE)
+            print(ge2e_emb.shape)
+            
             x = torch.concat((mfcc_allo_hidden_state, ge2e_emb),1)
         else:
             x = mfcc_allo_hidden_state

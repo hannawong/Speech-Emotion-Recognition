@@ -9,12 +9,15 @@ from SER.utils.runs import Run
 from SER.utils.utils import save_checkpoint
 from SER.parameters import SAVED_CHECKPOINTS
 
-MAX_LEN = 200
+MAX_LEN = 250
 WAV_PATH = "/content/drive/MyDrive/path_to_wavs/"
 ALLO_EMB_PATH = "/content/drive/MyDrive/allo_embedding/"
 GE2E_EMB_PATH = "../data/GE2E/"
 MFCC_EMB_PATH = "/content/drive/MyDrive/mfcc_embeddings/"
-GE2E_INPUT_PATH = "../data/GE2E_input/"
+
+file2allofeature = pkl.load(open("/content/drive/MyDrive/warm_up_pkls/allo.pkl","rb"))   ### Cache, to reduce I/O time
+file2mfcc_feature = pkl.load(open("/content/drive/MyDrive/warm_up_pkls/mfcc.pkl","rb"))
+file2ge2e_feature = pkl.load(open("/content/drive/MyDrive/warm_up_pkls/ge2e.pkl","rb"))
 
 def print_progress(scores):
     positive_avg, negative_avg = round(scores[:, 0].mean().item(), 2), round(scores[:, 1].mean().item(), 2)
@@ -51,7 +54,12 @@ def tensorize_triples(args,audio_files, labels, bsize): ##transform sentence int
     allo_embs = []
     length = []
     for file in audio_files:
-        allo_emb = pkl.load(open(ALLO_EMB_PATH+file.split("/")[-1]+".pkl","rb"))
+        if file in file2allofeature.keys():
+          allo_emb = file2allofeature[file]
+        else:
+          allo_emb = pkl.load(open(ALLO_EMB_PATH+file.split("/")[-1]+".pkl","rb"))
+          file2allofeature[file] = allo_emb
+
         allo_emb = allo_emb.squeeze()
 
         if allo_emb.shape[0] >= MAX_LEN:
@@ -68,40 +76,27 @@ def tensorize_triples(args,audio_files, labels, bsize): ##transform sentence int
     GE2E_embs = []
     for file in audio_files:
         if args.GE2E:
-            ge2e_emb = np.load(open(GE2E_EMB_PATH+file.split("/")[-1][:-4]+".npy","rb"))
+            if file in file2ge2e_feature.keys():
+              ge2e_emb = file2ge2e_feature[file]
+            else:
+              ge2e_emb = np.load(open(GE2E_EMB_PATH+file.split("/")[-1][:-4]+".npy","rb"))
+              file2ge2e_feature[file] = ge2e_emb
             ge2e_emb = np.expand_dims(ge2e_emb,0)
             ge2e_emb = torch.Tensor(ge2e_emb)
         else:
             ge2e_emb = torch.zeros((1,256))
         GE2E_embs.append(ge2e_emb)
     GE2E_embedding = torch.stack(GE2E_embs,axis = 0)
-    '''   
-    GE2E_inputs = []
-    GE2E_length = []
-    for file in audio_files:
-        ge2e_input_emb = pkl.load(open(GE2E_INPUT_PATH+"wav_"+file.split("/")[-1][:-4]+".npy","rb"))
-        ge2e_input_emb = ge2e_input_emb.squeeze()
-
-        if ge2e_input_emb.shape[0] >= MAX_LEN:
-            ge2e_input_emb = ge2e_input_emb[:MAX_LEN,:]
-            GE2E_length.append(MAX_LEN-1)
-        else:
-            GE2E_length.append(ge2e_input_emb.shape[0]-1)
-            zero = torch.zeros((MAX_LEN-ge2e_input_emb.shape[0], ge2e_input_emb.shape[1]))
-            ge2e_input_emb = torch.cat((ge2e_input_emb, zero), dim=0)
-            
-        ge2e_input_emb.append(ge2e_input_emb)
-    ge2e_input_embedding = torch.stack(ge2e_input_emb,axis = 0) ##len,emb_size
-    print(ge2e_input_embedding.shape)
-    print(ge2e_input_embedding)
-    exit()
-    '''
-
+    
 
     mfcc_embs = []
     mfcc_length = []
     for file in audio_files:
-        mfccs = pkl.load(open(MFCC_EMB_PATH+file.split("/")[-1]+".pkl","rb"))
+        if file in file2mfcc_feature:
+          mfccs = file2mfcc_feature[file]
+        else: 
+          mfccs = np.load(MFCC_EMB_PATH+file.split("/")[-1]+".npy")
+          file2mfcc_feature[file] = mfccs
         mfccs = torch.Tensor(np.transpose(mfccs))
         mfcc_length.append(min(mfccs.shape[0],MAX_LEN-1))
         if mfccs.shape[0] >= MAX_LEN:
@@ -113,19 +108,18 @@ def tensorize_triples(args,audio_files, labels, bsize): ##transform sentence int
         mfcc_embs.append(mfcc_emb)
     mfcc_embedding = torch.stack(mfcc_embs,axis = 0) ##len,emb_size
     
-    query_batches = _split_into_batches(allosaurus_embedding,GE2E_embedding,mfcc_embedding,labels,length,mfcc_length,bsize)
+    query_batches = _split_into_batches(allosaurus_embedding,GE2E_embedding,mfcc_embedding,labels,length,mfcc_length,audio_files,bsize)
     batches = []
-    for (embed,GE2E, MFCC,label,length,mfcc_length) in query_batches:
-        Q = (embed,GE2E,MFCC,label,length,mfcc_length)
+    for (embed,GE2E, MFCC,label,length,mfcc_length,audio_files) in query_batches:
+        Q = (embed,GE2E,MFCC,label,length,mfcc_length,audio_files)
         batches.append(Q)
-
     return batches
 
 
-def _split_into_batches(allosaurus_embedding, GE2E_embedding,mfcc_embedding, labels,length,mfcc_length,bsize):
+def _split_into_batches(allosaurus_embedding, GE2E_embedding,mfcc_embedding, labels,length,mfcc_length,audio_files,bsize):
     batches = []
     for offset in range(0, allosaurus_embedding.shape[0], bsize):
-        batches.append((allosaurus_embedding[offset:offset+bsize], GE2E_embedding[offset:offset+bsize],mfcc_embedding[offset:offset+bsize],labels[offset:offset+bsize],length[offset:offset+bsize],mfcc_length[offset:offset+bsize]))
+        batches.append((allosaurus_embedding[offset:offset+bsize], GE2E_embedding[offset:offset+bsize],mfcc_embedding[offset:offset+bsize],labels[offset:offset+bsize],length[offset:offset+bsize],mfcc_length[offset:offset+bsize],audio_files[offset:offset+bsize]))
     return batches
 
 

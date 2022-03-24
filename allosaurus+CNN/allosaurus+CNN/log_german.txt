@@ -1,8 +1,0 @@
-                       UA                   WA    
-GE2E(finetune)+MFCC+Allo:      0.8728               0.8936
-GE2E+MFCC+Allo:      0.8676               0.8905
-GE2E+MFCC+Allo(new)  0.8402               0.8709 
-Allo+GE2E            0.8322               0.8437
-MFCC:                0.7319               0.7812
-GE2E:                0.8274               0.8593                
-Allo:                0.6723               0.6718

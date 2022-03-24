@@ -95,18 +95,32 @@ avg:         0.6285
 
 ## Allo+GE2E+MFCC: (10 epoch, bz 512, lr 0.001)
                UA              WA
-Session1F:   0.7372          0.6366  
+Session1F:   0.7372          0.6366 (256 bz) 
 Session1M:   0.6461          0.6405  
-Session2F:   0.7601          0.6405 (256 batchsize)
+Session2F:   0.7106          0.5986 (256 batchsize)
 Session2M:   0.6666          0.6288  
 Session3F:   0.5799          0.5565
 Session3M:   0.6089          0.6054
 Session4F:   0.6210          0.5858
-Session4M:   0.5901          0.5507 
-Session5F:   0.6669          0.6210
+Session4M:   0.5901          0.5507  (256 bz) 
+Session5F:   0.6669          0.6210  (256 bz)
 Session5M:   0.5868          0.5273
 
-avg:         0.6446
+avg:      0.6414
+
+### Allo+GE2E(finetune)+MFCC w/o auxillary loss: (bz512,lr 0.001/0.001*0.025):
+
+Session1F: 0.71441936  , 0.6271
+Session1M: 0.6073 0.5878
+Session2F: 0.6794 0.5819
+Session2M: 0.6685240918278709  , 0.632749225
+Session3M: 0.5  993  0.5956
+Session3F: 0.5938311535820513  , 0.5761142635736426
+Session4M: 0.6396994191483705  , 0.5936906309369063
+Session4F: 0.623721630565018  , 0.6054082091790821
+Session5M: 0.5992   0.5413
+Session5F: 
+
 
 
 

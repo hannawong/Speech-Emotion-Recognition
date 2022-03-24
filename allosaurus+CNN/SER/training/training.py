@@ -13,6 +13,7 @@ from SER.training.utils import split_train_val_test_german
 from torch.optim.lr_scheduler import StepLR
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+print(DEVICE)
 LOG = open("log.txt",'w')
 CLASS_NUM = 4
 
@@ -45,8 +46,13 @@ def train(args):
     ser_model = ser_model.to(DEVICE)
 
     amp = MixedPrecisionManager(args.amp)
-    optimizer = AdamW(filter(lambda p: p.requires_grad, ser_model.parameters()),lr = args.lr,weight_decay=1e-5)
+
+    ge2e_params = list(map(id, ser_model.SpeakerEncoder.parameters()))
+    base_params = filter(lambda p: id(p) not in ge2e_params,ser_model.parameters())
+
+    optimizer = AdamW([{'params':base_params},{'params':ser_model.SpeakerEncoder.parameters(),'lr':args.lr*0.01}],lr = args.lr,weight_decay=1e-5)
     scheduler = StepLR(optimizer, step_size=2000, gamma=0.5)
+    optimizer.zero_grad()
 
     def training(step):
         ser_model.train()
@@ -60,10 +66,10 @@ def train(args):
         start_batch_idx = 0
 
         i = 0
+        accum = 0
         for batch_idx, BatchSteps in zip(range(start_batch_idx,args.maxsteps), reader):
-            for feat_emb, ge2e_emb, mfcc_emb, labels,length,mfcc_length in BatchSteps: 
+            for feat_emb, ge2e_emb, mfcc_emb, labels,length,mfcc_length,audio_files in BatchSteps: 
                 i += 1 
-                optimizer.zero_grad()
                 feat_emb = torch.Tensor(feat_emb).to(DEVICE) ##[bz,200,640]
                 ge2e_emb = torch.Tensor(ge2e_emb).to(DEVICE)
                 mfcc_emb = torch.Tensor(mfcc_emb).to(DEVICE) ##[bz,200,24]
@@ -72,15 +78,18 @@ def train(args):
                 mfcc_length = torch.Tensor(mfcc_length).to(DEVICE)
                 
 
-                with amp.context():
-                    loss,_ = ser_model(feat_emb,ge2e_emb,mfcc_emb,labels,length,mfcc_length)
-                    amp.backward(loss)
-                    print(loss)
-                    train_loss += loss.item()
+                loss,_ = ser_model(feat_emb,ge2e_emb,mfcc_emb,labels,length,mfcc_length,audio_files)
+                loss.backward()
+                print(loss)
+                train_loss += loss.item()
+                accum += 1
+                if accum == args.batch_accum:
+                  optimizer.step()
+                  optimizer.zero_grad()
+                  accum = 0
 
                 avg_loss = train_loss / (batch_idx+1)
                 msg = print_message(step, avg_loss)
-                amp.step(ser_model, optimizer)
                 step += 1
         LOG.write("loss: "+str(train_loss/i)+"\n")
 
@@ -98,7 +107,7 @@ def train(args):
         if not best_model:
             best_model = ser_model
         else:
-            if uacc > best_uacc:
+            if uacc >= best_uacc:
                 print("saving best model...")
                 best_uacc = uacc
                 torch.save(ser_model,"checkpoint.dnn")
@@ -125,7 +134,7 @@ def evaluate(args,model,path):
 
     with torch.no_grad():
         for batch_idx, BatchSteps in zip(range(start_batch_idx,args.maxsteps), reader):
-            for feat_emb,ge2e_emb, mfcc_emb,labels ,length,mfcc_length in BatchSteps: 
+            for feat_emb,ge2e_emb, mfcc_emb,labels ,length,mfcc_length,audio_files in BatchSteps: 
                 i += 1 
                 feat_emb = torch.Tensor(feat_emb).to(DEVICE) ##[bz,100,230]
                 labels = torch.Tensor(labels).to(DEVICE) ##[bz]
@@ -133,8 +142,9 @@ def evaluate(args,model,path):
                 length = torch.Tensor(length).to(DEVICE)
                 mfcc_emb = torch.Tensor(mfcc_emb).to(DEVICE)
                 mfcc_length = torch.Tensor(mfcc_length).to(DEVICE)
+                
 
-                loss, output = model(feat_emb,ge2e_emb,mfcc_emb,labels,length,mfcc_length)
+                loss, output = model(feat_emb,ge2e_emb,mfcc_emb,labels,length,mfcc_length,audio_files)
                 pred_label = torch.argmax(output,dim = 1)
                 acc = accuracy_score(pred_label.cpu().detach(),labels.cpu().detach())
                 tot_acc += acc

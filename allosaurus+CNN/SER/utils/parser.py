@@ -26,7 +26,7 @@ class Arguments():
         self.add_argument('--query_maxlen', dest='query_maxlen', default=32, type=int)
         self.add_argument('--doc_maxlen', dest='doc_maxlen', default=180, type=int)
         self.add_argument('--langs',dest = 'langs',type = str)
-
+        self.add_argument('--batch_accum',dest = 'batch_accum',type = int)
         # Filtering-related Arguments
         self.add_argument('--mask-punctuation', dest='mask_punctuation', default=False, action='store_true')
 
