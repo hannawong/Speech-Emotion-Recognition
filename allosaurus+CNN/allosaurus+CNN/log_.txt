@@ -1,0 +1,129 @@
+### base:
+               UA              WA
+Session1F:   0.6524          0.5702 
+Session1M:   0.5362          0.5292 
+Session2F:   0.5625          0.5897  
+Session2M:   0.5735          0.5527 
+Session3F:   0.4658          0.4589 
+Session3M:   0.4510          0.4452  
+Session4F:   0.5124          0.4980  
+Session4M:   0.5128          0.4765  
+Session5F:   0.5267          0.4941 
+Session5M:   0.4769          0.4648 
+             
+avg:         0.5270
+
+
+### CNN(k=3,5):
+               UA              WA
+Session1F:   0.6623          0.5077 
+Session1M:   0.5607          0.5546 
+Session2F:   0.6284          0.5468 
+Session2M:   0.5846          0.5370 
+Session3F:   0.4771          0.4609 
+Session3M:   0.4582          0.4628 
+Session4F:   0.5049          0.4784 
+Session4M:   0.4927          0.4413 
+Session5F:   0.5667          0.5116 
+Session5M:   0.4807          0.4413
+
+avg:         0.5416
+
+
+### GE2E+CNN(k=3,5):
+               UA              WA
+Session1F:   0.6842          0.5936
+Session1M:   0.6291          0.6171
+Session2F:   0.7076          0.6288
+Session2M:   0.6206          0.6015
+Session3F:   0.5385          0.5234
+Session3M:   0.5972          0.5976
+Session4F:   0.5534          0.5370
+Session4M:   0.5572          0.5194
+Session5F:   0.6163          0.5878
+Session5M:   0.5461          0.5038
+
+avg:         0.60502
+
+## GE2E+CNN(k=3,5)+self-attention:
+               UA              WA
+Session1F:   0.7322          0.6210
+Session1M:   0.6546          0.6425
+Session2F:   0.6960          0.6171
+Session2M:   0.6214          0.5937
+Session3F:   0.5427          0.5371   
+Session3M:   0.6240          0.6230
+Session4F:   0.5616          0.5527
+Session4M:   0.5930          0.5702
+Session5F:   0.6460          0.6034
+Session5M:   0.5730          0.5253
+
+avg:         0.6244
+
+
+######################## Alation study on features ######################
+
+## Allo: (5 epoch, bz 256, lr 0.001)
+               UA              WA
+Session1F:   0.6664         0.5936
+Session1M:   0.5554         0.5585
+Session2F:   0.6799         0.5390
+Session2M:   0.5858         0.5604
+Session3F:   0.4869         0.4823 
+Session3M:   0.5025         0.5058
+Session4F:   0.5322         0.5175
+Session4M:   0.5267         0.4726
+Session5F:   0.5429         0.4843
+Session5M:   0.5072         0.4706
+
+avg:         0.5586
+
+## Allo+GE2E: (10 epoch, bz 512, lr 0.001)
+               UA              WA
+Session1F:   0.7157          0.6327 
+Session1M:   0.6592          0.6445 
+Session2F:   0.7006          0.5936 
+Session2M:   0.6369          0.6113 
+Session3F:   0.56135         0.5429 
+Session3M:   0.5942          0.5859 
+Session4F:   0.5948          0.5780 
+Session4M:   0.6039          0.5741 
+Session5F:   0.6460          0.6034
+Session5M:   0.5730          0.5253
+
+avg:         0.6285
+
+## Allo+GE2E+MFCC: (10 epoch, bz 512, lr 0.001)
+               UA              WA
+Session1F:   0.7372          0.6366 (256 bz) 
+Session1M:   0.6461          0.6405  
+Session2F:   0.7106          0.5986 (256 batchsize)
+Session2M:   0.6666          0.6288  
+Session3F:   0.5799          0.5565
+Session3M:   0.6089          0.6054
+Session4F:   0.6210          0.5858
+Session4M:   0.5901          0.5507  (256 bz) 
+Session5F:   0.6669          0.6210  (256 bz)
+Session5M:   0.5868          0.5273
+
+avg:      0.6414
+
+### Allo+GE2E(finetune)+MFCC w/o auxillary loss: (bz512,lr 0.001/0.001*0.025):
+
+Session1F: 0.71441936  , 0.6271
+Session1M: 0.6073 0.5878
+Session2F: 0.6794 0.5819
+Session2M: 0.6685240918278709  , 0.632749225
+Session3M: 0.5  993  0.5956
+Session3F: 0.5938311535820513  , 0.5761142635736426
+Session4M: 0.6396994191483705  , 0.5936906309369063
+Session4F: 0.623721630565018  , 0.6054082091790821
+Session5M: 0.5992   0.5413
+Session5F: 
+
+
+
+
+
+
+
