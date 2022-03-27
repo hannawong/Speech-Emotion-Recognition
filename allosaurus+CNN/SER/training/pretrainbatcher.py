@@ -42,7 +42,7 @@ class PretrainBatcher():
 
     def collate(self, audio_filenames,labels):
         assert len(audio_filenames) == self.bsize
-        return self.tensorize_triples(self.args,audio_filenames, labels, self.bsize // self.accumsteps)
+        return self.tensorize_triples(self.args,"en",audio_filenames, labels, self.bsize // self.accumsteps)
 
 
     def skip_to_batch(self, batch_idx, intended_batch_size):

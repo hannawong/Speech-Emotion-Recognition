@@ -7,13 +7,61 @@ from SER.modeling.GE2E_model import SpeakerEncoder
 from SER.modeling.audio import *
 from SER.modeling.inference import *
 import pickle as pkl
-dic = {}
-
+import pandas as pd
+from tqdm import tqdm
+dic = pkl.load(open("/content/drive/MyDrive/warm_up_pkls/ge2e_input.pkl","rb"))
+print("warm up finish!")
 state_fpath = "/content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/SER/modeling/encoder.pt"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+'''
+#=========================
+data = pd.read_csv("/content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/persian/total.csv")
+data1 = pd.read_csv("/content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/emodb/total.csv")
+
+data2 = pd.read_csv("/content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_01F.test.csv")
+data3 = pd.read_csv("/content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_01F.train.csv")
+data4 = pd.read_csv("/content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_01F.val.csv")
+
+for file in tqdm(list(data3[data3.columns[0]])):
+  try:
+    wav = preprocess_wav("/content/drive/MyDrive/path_to_wavs/"+file.split("/")[-1])
+    dic[file] = wav
+  except:
+    print(file)
+
+
+for file in tqdm(list(data2[data2.columns[0]])):
+  try:
+    wav = preprocess_wav("/content/drive/MyDrive/path_to_wavs/"+file.split("/")[-1])
+    dic[file] = wav
+  except:
+    print(file)
+
+for file in tqdm(list(data4[data4.columns[0]])):
+  try:
+    wav = preprocess_wav("/content/drive/MyDrive/path_to_wavs/"+file.split("/")[-1])
+    dic[file] = wav
+  except:
+    print(file)
+for file in tqdm(list(data[data.columns[1]])+list(data1[data1.columns[1]])):
+  try:
+    wav = preprocess_wav("/content/drive/MyDrive/path_to_wavs/"+file.split("/")[-1])
+    dic[file] = wav
+  except:
+    print(file)
+
+output = open('/content/drive/MyDrive/warm_up_pkls/ge2e_input.pkl', 'wb')
+pkl.dump(dic, output)
+'''
+#====================
+
+              
+              
+
 
 class SER_MODEL(nn.Module):
     def __init__(self, args,audio_maxlen, num_labels, hidden_size = 128):
+
         if args.langs == "pe":
             ALLO_CONV_SIZE = 32
             ALLO_LSTM_SIZE = 32
@@ -74,7 +122,7 @@ class SER_MODEL(nn.Module):
 
         ############# for GE2E finetuning #############
         
-        self.SpeakerEncoder = SpeakerEncoder("cpu","cpu")  ####small learning rate
+        self.SpeakerEncoder = SpeakerEncoder('cpu','cpu')  ####small learning rate
         checkpoint = torch.load(state_fpath, map_location='cpu')
         self.SpeakerEncoder.load_state_dict(checkpoint["model_state"])
         self.SpeakerEncoder = self.SpeakerEncoder.to(DEVICE)
@@ -151,6 +199,28 @@ class SER_MODEL(nn.Module):
         context_layer = torch.matmul(attention_probs, V)
         return context_layer.squeeze()
 
+    def construct_matrix_embed(self,embeds,labels):
+      label_cnt = {}
+      for i in range(len(labels)):
+        if int(labels[i].item()) not in label_cnt:
+          label_cnt[int(labels[i].item())] = 1
+        else:
+          label_cnt[int(labels[i].item())] += 1
+      label_cnt_pruned = {} ###only retain those cnt >= 5
+      for k in label_cnt.keys():
+        if label_cnt[k] >= self.args.bsize // self.num_labels - 3:
+          label_cnt_pruned[k] = label_cnt[k]
+      speaker_per_batch = len(label_cnt_pruned)
+      utterances_per_speaker = np.min(list(label_cnt_pruned.values()))
+      embeddings = np.zeros((speaker_per_batch,utterances_per_speaker,embeds.shape[-1]))
+      for k in range(len(label_cnt_pruned.keys())): ### emotions
+        key = list(label_cnt_pruned.keys())[k]
+        cnt = 0
+        for i in range(len(labels)):
+          if int(labels[i].item()) == key and cnt < utterances_per_speaker:
+            embeddings[k][cnt] = embeds[i].cpu().detach().numpy()
+            cnt += 1
+      return torch.Tensor(embeddings)
 
     def classification_score(self,feat_emb,ge2e_emb,mfcc_emb,label,length,mfcc_length,audio_files):
         
@@ -197,6 +267,8 @@ class SER_MODEL(nn.Module):
             ge2e_emb = torch.stack(ge2e_emb, axis = 0)
             ge2e_emb = ge2e_emb.to(DEVICE)
             print(ge2e_emb.shape)
+          
+            
             
             x = torch.concat((mfcc_allo_hidden_state, ge2e_emb),1)
         else:
@@ -207,20 +279,25 @@ class SER_MODEL(nn.Module):
         if self.args.only_MFCC:
             x = mfcc_hidden_state
         ############## MLP ################
+        matrix_embedding = self.construct_matrix_embed(x,label).to(DEVICE)
+        contrastive_loss,err = self.SpeakerEncoder.loss(matrix_embedding)
+        print("contrastive loss:",contrastive_loss,err)
+
         x = self.dense1(x)
         x = self.bn(x)
         m = nn.Mish()
         #x = F.gelu(x)
+        
         x = torch.tanh(x)
-        if self.args.langs == "pe":
-            x = m(x)
+        if self.args.langs in ["pe"]:
+          x = m(x)
         x = self.dropout(x)
         x = self.dense2(x)
         x = self.bn1(x)
         
         x = F.relu(x)
         if self.args.langs == "pe":
-            x = F.gelu(x)
+          x = F.gelu(x)
         x = self.dropout(x)
         x = self.dense3(x)
         x = self.bn2(x)
@@ -229,4 +306,6 @@ class SER_MODEL(nn.Module):
         loss_fct = torch.nn.CrossEntropyLoss()
         label = label.long()
         loss = loss_fct(x.view(-1, self.num_labels), label.view(-1))
-        return loss,x
+        alpha = 0.3
+        total_loss = loss+alpha*contrastive_loss
+        return total_loss,x

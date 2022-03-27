@@ -8,6 +8,7 @@ import numpy as np
 import torch
 from SER.modeling.params_data import *
 from SER.modeling.params_model import *
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 class SpeakerEncoder(nn.Module):
     def __init__(self, device, loss_device):
@@ -72,11 +73,11 @@ class SpeakerEncoder(nn.Module):
         speakers_per_batch, utterances_per_speaker = embeds.shape[:2]
         
         # Inclusive centroids (1 per speaker). Cloning is needed for reverse differentiation
-        centroids_incl = torch.mean(embeds, dim=1, keepdim=True)
+        centroids_incl = torch.mean(embeds, dim=1, keepdim=True).to(DEVICE)
         centroids_incl = centroids_incl.clone() / (torch.norm(centroids_incl, dim=2, keepdim=True) + 1e-5)
 
         # Exclusive centroids (1 per utterance)
-        centroids_excl = (torch.sum(embeds, dim=1, keepdim=True) - embeds)
+        centroids_excl = (torch.sum(embeds, dim=1, keepdim=True) - embeds).to(DEVICE)
         centroids_excl /= (utterances_per_speaker - 1)
         centroids_excl = centroids_excl.clone() / (torch.norm(centroids_excl, dim=2, keepdim=True) + 1e-5)
 
@@ -84,7 +85,7 @@ class SpeakerEncoder(nn.Module):
         # product of these vectors (which is just an element-wise multiplication reduced by a sum).
         # We vectorize the computation for efficiency.
         sim_matrix = torch.zeros(speakers_per_batch, utterances_per_speaker,
-                                 speakers_per_batch).to(self.loss_device)
+                                 speakers_per_batch).to(DEVICE)
         mask_matrix = 1 - np.eye(speakers_per_batch, dtype=np.int)
         for j in range(speakers_per_batch):
             mask = np.where(mask_matrix[j])[0]
@@ -101,7 +102,7 @@ class SpeakerEncoder(nn.Module):
         # sim_matrix2[mask] = (embeds * centroids_excl).sum(dim=2)
         # sim_matrix2 = sim_matrix2.transpose(1, 2)
         
-        sim_matrix = sim_matrix * self.similarity_weight + self.similarity_bias
+        sim_matrix = sim_matrix * self.similarity_weight.to(DEVICE) + self.similarity_bias.to(DEVICE)
         return sim_matrix
     
     def loss(self, embeds):
@@ -119,8 +120,8 @@ class SpeakerEncoder(nn.Module):
         sim_matrix = sim_matrix.reshape((speakers_per_batch * utterances_per_speaker, 
                                          speakers_per_batch))
         ground_truth = np.repeat(np.arange(speakers_per_batch), utterances_per_speaker)
-        target = torch.from_numpy(ground_truth).long().to(self.loss_device)
-        loss = self.loss_fn(sim_matrix, target)
+        target = torch.from_numpy(ground_truth).long().to(DEVICE)
+        loss = self.loss_fn(sim_matrix, target).to(DEVICE)
         
         # EER (not backpropagated)
         with torch.no_grad():

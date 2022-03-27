@@ -15,9 +15,13 @@ ALLO_EMB_PATH = "/content/drive/MyDrive/allo_embedding/"
 GE2E_EMB_PATH = "../data/GE2E/"
 MFCC_EMB_PATH = "/content/drive/MyDrive/mfcc_embeddings/"
 
+file2allofeature = {}
+file2ge2e_feature = {}
+file2mfcc_feature = {}
 file2allofeature = pkl.load(open("/content/drive/MyDrive/warm_up_pkls/allo.pkl","rb"))   ### Cache, to reduce I/O time
 file2mfcc_feature = pkl.load(open("/content/drive/MyDrive/warm_up_pkls/mfcc.pkl","rb"))
 file2ge2e_feature = pkl.load(open("/content/drive/MyDrive/warm_up_pkls/ge2e.pkl","rb"))
+print("warm up finish!")
 
 def print_progress(scores):
     positive_avg, negative_avg = round(scores[:, 0].mean().item(), 2), round(scores[:, 1].mean().item(), 2)
@@ -49,7 +53,7 @@ def shuf_order(langs):
     return tmp
 
 
-def tensorize_triples(args,audio_files, labels, bsize): ##transform sentence into ids and masks
+def tensorize_triples(args,lang,audio_files, labels, bsize): ##transform sentence into ids and masks
     assert bsize is None or len(audio_files) % bsize == 0
     allo_embs = []
     length = []
@@ -95,7 +99,10 @@ def tensorize_triples(args,audio_files, labels, bsize): ##transform sentence int
         if file in file2mfcc_feature:
           mfccs = file2mfcc_feature[file]
         else: 
-          mfccs = np.load(MFCC_EMB_PATH+file.split("/")[-1]+".npy")
+          if lang == "en":
+            mfccs = pkl.load(open(MFCC_EMB_PATH+file.split("/")[-1]+".pkl","rb"))
+          else:
+            mfccs = np.load(MFCC_EMB_PATH+file.split("/")[-1]+".npy")
           file2mfcc_feature[file] = mfccs
         mfccs = torch.Tensor(np.transpose(mfccs))
         mfcc_length.append(min(mfccs.shape[0],MAX_LEN-1))

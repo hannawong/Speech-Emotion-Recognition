@@ -50,7 +50,7 @@ def train(args):
     ge2e_params = list(map(id, ser_model.SpeakerEncoder.parameters()))
     base_params = filter(lambda p: id(p) not in ge2e_params,ser_model.parameters())
 
-    optimizer = AdamW([{'params':base_params},{'params':ser_model.SpeakerEncoder.parameters(),'lr':args.lr*0.01}],lr = args.lr,weight_decay=1e-5)
+    optimizer = AdamW([{'params':base_params},{'params':ser_model.SpeakerEncoder.parameters(),'lr':args.lr*0.1}],lr = args.lr,weight_decay=1e-5)
     scheduler = StepLR(optimizer, step_size=2000, gamma=0.5)
     optimizer.zero_grad()
 
@@ -95,7 +95,7 @@ def train(args):
 
             
     step = 0
-    for epoch in range(50):
+    for epoch in range(20):
         scheduler.step()
         print('Epoch:', epoch,'LR:', scheduler.get_lr())
         LOG.write("="*30+"epoch: "+str(epoch)+"="*30+">"+"\n")
@@ -110,10 +110,11 @@ def train(args):
             if uacc >= best_uacc:
                 print("saving best model...")
                 best_uacc = uacc
-                torch.save(ser_model,"checkpoint.dnn")
+                best_model = ser_model
+                torch.save(best_model,"checkpoint.dnn")
     
     print("finish training, now test on testset")
-    best_model = torch.load("checkpoint.dnn")
+    #best_model = torch.load("checkpoint.dnn")
     evaluate(args,best_model,TEST_PATH)
 
 def evaluate(args,model,path):
