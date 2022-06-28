@@ -23,7 +23,6 @@ class high_layers(nn.Module):
                                            requires_grad=True)
     def forward(self,x):
         self.s = torch.sigmoid(torch.log(self.u) - torch.log(1 - self.u) + torch.log(self.alpha) / self.beta)
-        print(self.s,"ssss")
         self.s_ = self.s * (self.eplison - self.gamma) + self.gamma
 
         self.z_params = (self.s_ > 0).float() * self.s_
@@ -31,5 +30,4 @@ class high_layers(nn.Module):
 
         output = self.z_params * self.w_params
         output = torch.einsum('anc,cd -> and', x, output)
-        print(output,"output")
         return output

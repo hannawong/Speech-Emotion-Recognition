@@ -6,9 +6,6 @@ import numpy as np
 from SER_mmoe.modeling.GE2E_model import SpeakerEncoder
 from SER_mmoe.modeling.audio import *
 from SER_mmoe.modeling.inference import *
-import pickle as pkl
-import pandas as pd
-from tqdm import tqdm
 from SER_mmoe.modeling.DSBN import high_layers
 state_fpath = "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/Speech-Emotion-Recognition/allosaurus+CNN/SER/modeling/encoder.pt"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -22,7 +19,7 @@ class SER_MODEL(nn.Module):
 
         ALLO_CONV_SIZE = 64
         ALLO_LSTM_SIZE = 128
-        ALLO_ATTN_SIZE = 128
+        ALLO_ATTN_SIZE = 256
         ALLO_LSTM_NUM = 1
 
         MFCC_CONV_SIZE = 32
@@ -79,26 +76,27 @@ class SER_MODEL(nn.Module):
         self.W_ge = nn.Linear(256,128)
         self.W_fr = nn.Linear(256,128)
 
-        self.W_pe_1 = nn.Linear(128,32)
+        self.W_pe_1 = nn.Linear(128,64)
         self.W_en_1 = nn.Linear(128,64)
         self.W_ge_1 = nn.Linear(128,64)
         self.W_fr_1 = nn.Linear(128,64)
 
-        self.W_pe_2 = nn.Linear(32,4)
+        self.W_pe_2 = nn.Linear(64,32)
         self.W_en_2 = nn.Linear(64,32)
         self.W_ge_2 = nn.Linear(64,32)
         self.W_fr_2 = nn.Linear(64,32)
 
-        self.W_en_3 = nn.Linear(32,4)
+        self.W_pe_3 = nn.Linear(32,5)
+        self.W_en_3 = nn.Linear(32,5)
         self.W_ge_3 = nn.Linear(32,4)
-        self.W_fr_3 = nn.Linear(32,2)
+        self.W_fr_3 = nn.Linear(32,5)
 
         ########### feature attention ###############
 
-        self.high_layer = high_layers(128,128)
-        self.Q_layer_feat = {"ge":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda(),"en":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda()}
-        self.K_layer_feat =  {"ge":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda(),"en":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda()}
-        self.V_layer_feat =  {"ge":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda(),"en":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda()}
+        self.high_layer = high_layers(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE)
+        self.Q_layer_feat = {"ge":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda(),"en":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda(),"pe":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda()}
+        self.K_layer_feat =  {"ge":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda(),"en":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda(),"pe":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda()}
+        self.V_layer_feat =  {"ge":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda(),"en":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda(),"pe":nn.Linear(ALLO_ATTN_SIZE,ALLO_ATTN_SIZE).cuda()}
         
 
         ########## MLP ############
@@ -135,10 +133,22 @@ class SER_MODEL(nn.Module):
         self.dense3_pe = nn.Linear(hidden_size_pe,hidden_size_pe // 2)
         self.dense3_fr = nn.Linear(hidden_size_fr,hidden_size_fr // 2)
 
+        self.bn3_pe = torch.nn.BatchNorm1d(hidden_size_pe//4)
+        self.dense4_pe = nn.Linear(hidden_size_pe // 2,hidden_size_pe // 4)
+
         self.out_proj_en = nn.Linear(hidden_size_en//2, 4)
-        self.out_proj_ge = nn.Linear(hidden_size_ge//2, 6)
-        self.out_proj_pe = nn.Linear(hidden_size_pe//2, 6)
+        self.out_proj_ge = nn.Linear(hidden_size_ge//2, 7)
+        self.out_proj_pe = nn.Linear(hidden_size_pe//4, 6)
         self.out_proj_fr = nn.Linear(hidden_size_fr//2, 7)
+
+        self.adaptor = nn.Linear(2048,512)
+        self.adaptor1 = nn.Linear(512,ALLO_ATTN_SIZE)
+
+        self.similarity_weight = nn.Parameter(torch.tensor([10.])).to(DEVICE)
+        self.similarity_bias = nn.Parameter(torch.tensor([-5.])).to(DEVICE)
+
+        # Loss
+        self.loss_fn = nn.CrossEntropyLoss().to(DEVICE)
 
 
 
@@ -207,7 +217,7 @@ class SER_MODEL(nn.Module):
         V = self.V_layer_wav2vec(lstm_output) ##(batchsize,max_len,128)
         attention_scores = torch.matmul(Q_last_hidden_state,K.permute(0,2,1))
         attention_scores = torch.multiply(attention_scores,
-                                   1.0 / math.sqrt(float(K.shape[-1])+0.001))
+                                   1.0 / math.sqrt(float(K.shape[-1])+0.0001))
 
         attention_mask = self.get_attention_mask(lstm_output,length) ##can only attend to hidden state that really exist
         adder = (1.0 - attention_mask.long()) * -10000.0  ##-infty, [batchsize,150]
@@ -233,7 +243,86 @@ class SER_MODEL(nn.Module):
         context_layer = torch.matmul(attention_probs, V)
         return context_layer.squeeze()
 
-    def construct_matrix_embed(self,embeds,labels,bsize,num_labels):
+    def similarity_matrix(self, embeds):
+        """
+        Computes the similarity matrix according the section 2.1 of GE2E.
+
+        :param embeds: the embeddings as a tensor of shape (speakers_per_batch, 
+        utterances_per_speaker, embedding_size)
+        :return: the similarity matrix as a tensor of shape (speakers_per_batch,
+        utterances_per_speaker, speakers_per_batch)
+        """
+        speakers_per_batch, utterances_per_speaker = embeds.shape[:2]
+        
+        # Inclusive centroids (1 per speaker). Cloning is needed for reverse differentiation
+        centroids_incl = torch.mean(embeds, dim=1, keepdim=True).to(DEVICE)
+        centroids_incl = centroids_incl.clone() / (torch.norm(centroids_incl, dim=2, keepdim=True) + 1e-5)
+
+        # Exclusive centroids (1 per utterance)
+        centroids_excl = (torch.sum(embeds, dim=1, keepdim=True) - embeds).to(DEVICE)
+        centroids_excl /= (utterances_per_speaker - 1)
+        centroids_excl = centroids_excl.clone() / (torch.norm(centroids_excl, dim=2, keepdim=True) + 1e-5)
+
+        # Similarity matrix. The cosine similarity of already 2-normed vectors is simply the dot
+        # product of these vectors (which is just an element-wise multiplication reduced by a sum).
+        # We vectorize the computation for efficiency.
+        sim_matrix = torch.zeros(speakers_per_batch, utterances_per_speaker,
+                                 speakers_per_batch).to(DEVICE)
+        mask_matrix = 1 - np.eye(speakers_per_batch, dtype=np.int)
+        for j in range(speakers_per_batch):
+            mask = np.where(mask_matrix[j])[0]
+            sim_matrix[mask, :, j] = (embeds[mask] * centroids_incl[j]).sum(dim=2)
+            sim_matrix[j, :, j] = (embeds[j] * centroids_excl[j]).sum(dim=1)
+        
+        ## Even more vectorized version (slower maybe because of transpose)
+        # sim_matrix2 = torch.zeros(speakers_per_batch, speakers_per_batch, utterances_per_speaker
+        #                           ).to(self.loss_device)
+        # eye = np.eye(speakers_per_batch, dtype=np.int)
+        # mask = np.where(1 - eye)
+        # sim_matrix2[mask] = (embeds[mask[0]] * centroids_incl[mask[1]]).sum(dim=2)
+        # mask = np.where(eye)
+        # sim_matrix2[mask] = (embeds * centroids_excl).sum(dim=2)
+        # sim_matrix2 = sim_matrix2.transpose(1, 2)
+        
+        sim_matrix = sim_matrix * self.similarity_weight.to(DEVICE) + self.similarity_bias.to(DEVICE)
+        return sim_matrix
+
+    def loss(self, embeds):
+        """
+        Computes the softmax loss according the section 2.1 of GE2E.
+        
+        :param embeds: the embeddings as a tensor of shape (speakers_per_batch, 
+        utterances_per_speaker, embedding_size)
+        :return: the loss and the EER for this batch of embeddings.
+        """
+        speakers_per_batch, utterances_per_speaker = embeds.shape[:2]
+        
+        # Loss
+        sim_matrix = self.similarity_matrix(embeds)
+        sim_matrix = sim_matrix.reshape((speakers_per_batch * utterances_per_speaker, 
+                                         speakers_per_batch))
+        ground_truth = np.repeat(np.arange(speakers_per_batch), utterances_per_speaker)
+        target = torch.from_numpy(ground_truth).long().to(DEVICE)
+        loss = self.loss_fn(sim_matrix, target).to(DEVICE)
+        return loss,0
+
+    def construct_matrix_embed(self,embeds,labels,bsize,label_num,prune = False):
+      '''
+      buf = [[] for _ in range(num_labels)]
+      for i in range(len(labels)):
+        buf[int(labels[i].item())].append(embeds[i])
+      
+      mmin = 10000
+      for i in range(num_labels):
+            buf[i] = torch.stack(buf[i])
+            mmin = min(mmin,buf[i].shape[0])
+      for i in range(num_labels):
+            buf[i] = buf[i][:mmin]
+      embedding = torch.stack(buf)
+    
+      return embedding 
+      '''
+         
       label_cnt = {}
       for i in range(len(labels)):
         if int(labels[i].item()) not in label_cnt:
@@ -242,8 +331,11 @@ class SER_MODEL(nn.Module):
           label_cnt[int(labels[i].item())] += 1
       label_cnt_pruned = {} ###only retain those cnt >= 5
       for k in label_cnt.keys():
-        if label_cnt[k] >= bsize // num_labels - 3:
-          label_cnt_pruned[k] = label_cnt[k]
+            if prune:
+              if label_cnt[k] > 5:
+                label_cnt_pruned[k] = label_cnt[k]
+            else:
+                label_cnt_pruned[k] = label_cnt[k]
       speaker_per_batch = len(label_cnt_pruned)
       utterances_per_speaker = np.min(list(label_cnt_pruned.values()))
       embeddings = torch.zeros((speaker_per_batch,utterances_per_speaker,embeds.shape[-1]))
@@ -254,11 +346,13 @@ class SER_MODEL(nn.Module):
           if int(labels[i].item()) == key and cnt < utterances_per_speaker:
             embeddings[k][cnt] = embeds[i]
             cnt += 1
+      print(embeddings.shape)
       return torch.Tensor(embeddings)
 
     def classification_score(self,lang,feat_emb,ge2e_emb,mfcc_emb,label,length,mfcc_length,wav2vec_emb,wav2vec_length,bloy_embedding,audio_files):
         
         ########## allosaurus features #############
+        print(feat_emb.shape)
         feat_emb = feat_emb.permute(0, 2, 1)
         x = self.conv1d_1(feat_emb)
         x1 = self.conv1d_2(feat_emb)
@@ -290,27 +384,36 @@ class SER_MODEL(nn.Module):
 
         ############### add ge2e #####################
         ge2e_emb = ge2e_emb.squeeze()  ### hard-encode ge2e_emb
+        if lang == "ge":
         
-        ge2e_emb = []
-        for i in range(len(audio_files)):
-          wav = preprocess_wav("/data/jiayu_xiao/IEMOCAP/path_to_wavs/"+audio_files[i].split("/")[-1])
-          emb = embed_utterance(wav,self.SpeakerEncoder.to(DEVICE))
-          ge2e_emb.append(torch.Tensor(emb))
-        ge2e_emb = torch.stack(ge2e_emb, axis = 0)
-        
+          ge2e_emb = []
+          for i in range(len(audio_files)):
+            wav = preprocess_wav("/data/jiayu_xiao/IEMOCAP/path_to_wavs/"+audio_files[i].split("/")[-1])
+            emb = embed_utterance(wav,self.SpeakerEncoder.to(DEVICE))
+            ge2e_emb.append(torch.Tensor(emb))
+          ge2e_emb = torch.stack(ge2e_emb, axis = 0)
+          
         ge2e_emb = ge2e_emb.to(DEVICE)
         bloy_embedding = bloy_embedding.squeeze().to(DEVICE)
-        #ge2e_emb = torch.add(ge2e_emb,bloy_embedding)
 
 
+        
         inp = torch.stack([allo_hidden_state,mfcc_hidden_state,wav2vec_hidden_state])
         output = self.high_layer(inp)
         allo_hidden_state,mfcc_hidden_state,wav2vec_hidden_state = output[0],output[1],output[2]
-
+        
         
         ############## MLP ################
         if lang == "fr":
-            score = self.W_fr(ge2e_emb)
+            bloy_embedding = bloy_embedding[:,0,:] + bloy_embedding[:,1,:]
+            bloy_embedding = self.adaptor(bloy_embedding)
+            bloy_embedding = self.adaptor1(bloy_embedding)
+            '''
+            feat_input = torch.stack([allo_hidden_state,mfcc_hidden_state,wav2vec_hidden_state,bloy_embedding])
+            feat_output = self.self_attention_layer_feat(feat_input,"fr")
+            allo_hidden_state,mfcc_hidden_state,wav2vec_hidden_state,bloy_embedding = feat_output[0],feat_output[1],feat_output[2],feat_output[3]
+            '''
+            score =self.W_fr(ge2e_emb)
             score = F.relu(score)
             score = self.W_fr_1(score)
             score = F.relu(score)
@@ -318,16 +421,22 @@ class SER_MODEL(nn.Module):
             score = F.relu(score)
             score = self.W_fr_3(score)
             score = nn.Softmax(dim = 1)(score)
+            print(torch.mean(score,0),"******************")
             #np.save("/content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/SER_mmoe/pe.npy",score.cpu().detach().numpy())
-            #allo_hidden_state = torch.matmul(allo_hidden_state.T,torch.diag(score[:,0])).T
-            mfcc_hidden_state = torch.matmul(mfcc_hidden_state.T,torch.diag(score[:,0])).T
-            #wav2vec_hidden_state = torch.matmul(wav2vec_hidden_state.T,torch.diag(score[:,2])).T
-            ge2e_emb = torch.matmul(ge2e_emb.T,torch.diag(score[:,1])).T
             
-            x = torch.concat((mfcc_hidden_state, ge2e_emb),1)
-            matrix_embedding = self.construct_matrix_embed(x,label,ge2e_emb.shape[0],7).to(DEVICE)
-            contrastive_loss,err = self.SpeakerEncoder.loss(matrix_embedding)
-            print("contrastive loss:",contrastive_loss,err)
+            allo_hidden_state = torch.matmul(allo_hidden_state.T,torch.diag(score[:,0])).T
+            mfcc_hidden_state = torch.matmul(mfcc_hidden_state.T,torch.diag(score[:,1])).T
+            wav2vec_hidden_state = torch.matmul(wav2vec_hidden_state.T,torch.diag(score[:,2])).T
+            ge2e_emb = torch.matmul(ge2e_emb.T,torch.diag(score[:,3])).T
+            bloy_embedding = torch.matmul(bloy_embedding.T,torch.diag(score[:,4])).T
+            
+          
+            mfcc_allo_hidden_state = torch.add(allo_hidden_state,mfcc_hidden_state)
+            mfcc_allo_wav2vec_hidden_state = torch.add(mfcc_allo_hidden_state,wav2vec_hidden_state)
+            print(bloy_embedding.shape,mfcc_allo_hidden_state.shape)
+            all_hidden_state = torch.add(bloy_embedding,mfcc_allo_wav2vec_hidden_state)
+            x = torch.concat((all_hidden_state, ge2e_emb),1)
+
             print(x.shape)
             x = self.dense1_fr(x)
             x = self.bn_fr(x)
@@ -340,41 +449,57 @@ class SER_MODEL(nn.Module):
             x = self.dense3_fr(x)
             x = self.bn2_fr(x)
             x = F.gelu(x)
+            matrix_embedding = self.construct_matrix_embed(x,label,ge2e_emb.shape[0],7).to(DEVICE)
+            contrastive_loss,err = self.SpeakerEncoder.loss(matrix_embedding)
+            print("contrastive loss:",contrastive_loss,err)
             x = self.out_proj_fr(x)
             loss_fct = torch.nn.CrossEntropyLoss()
             label = label.long()
 
             loss = loss_fct(x.view(-1, 7), label.view(-1))
-            alpha = 0.1
+            alpha = 0.015
             total_loss = loss+alpha*contrastive_loss
             return total_loss,x
 
         if lang == "pe":
           
+          bloy_embedding = self.adaptor(bloy_embedding)
+          bloy_embedding = self.adaptor1(bloy_embedding)
+          '''
+          feat_input = torch.stack([allo_hidden_state,mfcc_hidden_state,wav2vec_hidden_state,bloy_embedding])
+          feat_output = self.self_attention_layer_feat(feat_input,"pe")
+          allo_hidden_state,mfcc_hidden_state,wav2vec_hidden_state,bloy_embedding = feat_output[0],feat_output[1],feat_output[2],feat_output[3]
+          '''
           score = self.W_pe(ge2e_emb)
           score = F.relu(score)
           score = self.W_pe_1(score)
           score = F.relu(score)
           score = self.W_pe_2(score)
+          score = F.relu(score)
+          score = self.W_pe_3(score)
           score = nn.Softmax(dim = 1)(score)
+          print(torch.mean(score,0),"******************")
+          
           #np.save("/content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/SER_mmoe/pe.npy",score.cpu().detach().numpy())
           allo_hidden_state = torch.matmul(allo_hidden_state.T,torch.diag(score[:,0])).T
           mfcc_hidden_state = torch.matmul(mfcc_hidden_state.T,torch.diag(score[:,1])).T
           wav2vec_hidden_state = torch.matmul(wav2vec_hidden_state.T,torch.diag(score[:,2])).T
           ge2e_emb = torch.matmul(ge2e_emb.T,torch.diag(score[:,3])).T
+          bloy_embedding = torch.matmul(bloy_embedding.T,torch.diag(score[:,4])).T
+          
           
           mfcc_allo_hidden_state = torch.add(allo_hidden_state,mfcc_hidden_state)
           mfcc_allo_wav2vec_hidden_state = torch.add(mfcc_allo_hidden_state,wav2vec_hidden_state)
-          x = torch.concat((mfcc_allo_wav2vec_hidden_state, ge2e_emb),1)
-          matrix_embedding = self.construct_matrix_embed(x,label,ge2e_emb.shape[0],6).to(DEVICE)
-          contrastive_loss,err = self.SpeakerEncoder.loss(matrix_embedding)
-          print("contrastive loss:",contrastive_loss,err)
+          all_hidden_state = torch.add(bloy_embedding,mfcc_allo_wav2vec_hidden_state)
+          x = torch.concat((all_hidden_state, ge2e_emb),1)
+
           
           x = self.dense1_pe(x)
           x = self.bn_pe(x)
           m = nn.Mish()
           x = torch.tanh(x)
           x = m(x)
+          #x = F.relu(x)
           x = self.dropout1(x)
           x = self.dense2_pe(x)
           x = self.bn1_pe(x)
@@ -384,19 +509,25 @@ class SER_MODEL(nn.Module):
           x = self.dense3_pe(x)
           x = self.bn2_pe(x)
           x = F.gelu(x)
-          
+          x = self.dropout(x)
+          x = self.dense4_pe(x)
+          x = self.bn3_pe(x)
+          x = m(x)
+          matrix_embedding = self.construct_matrix_embed(x,label,ge2e_emb.shape[0],6,True).to(DEVICE)
+          contrastive_loss,err = self.loss(matrix_embedding)
           x = self.out_proj_pe(x)
           loss_fct = torch.nn.CrossEntropyLoss()
           label = label.long()
           loss = loss_fct(x.view(-1, 6), label.view(-1))
-          alpha = 0.3
+          alpha = 0.01
           total_loss = loss+alpha*contrastive_loss
           return total_loss,x
 
         if lang == "en":
-          #feat_input = torch.stack([allo_hidden_state,mfcc_hidden_state,wav2vec_hidden_state])
-          #feat_output = self.self_attention_layer_feat(feat_input,"en").permute(1,0,2).cuda()
-          #allo_hidden_state,mfcc_hidden_state,wav2vec_hidden_state = feat_output[:,0,:],feat_output[:,1,:],feat_output[:,2,:]
+          bloy_embedding = self.adaptor(bloy_embedding)
+          bloy_embedding = self.adaptor1(bloy_embedding)
+          
+          
           score = self.W_en(ge2e_emb)
           score = F.relu(score)
           score = self.W_en_1(score)
@@ -405,23 +536,29 @@ class SER_MODEL(nn.Module):
           score = F.relu(score)
           score = self.W_en_3(score)
           score = nn.Softmax(dim = 1)(score)
+          print(torch.mean(score,0),"******************")
+          '''
           #np.save("/content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/SER_mmoe/en.npy",score.cpu().detach().numpy())
           allo_hidden_state = torch.matmul(allo_hidden_state.T,torch.diag(score[:,0])).T
           mfcc_hidden_state = torch.matmul(mfcc_hidden_state.T,torch.diag(score[:,1])).T
           wav2vec_hidden_state = torch.matmul(wav2vec_hidden_state.T,torch.diag(score[:,2])).T
           ge2e_emb = torch.matmul(ge2e_emb.T,torch.diag(score[:,3])).T
+          bloy_embedding = torch.matmul(bloy_embedding.T,torch.diag(score[:,4])).T
+          '''
           
           mfcc_allo_hidden_state = torch.add(allo_hidden_state,mfcc_hidden_state)
           mfcc_allo_wav2vec_hidden_state = torch.add(mfcc_allo_hidden_state,wav2vec_hidden_state)
-          x = torch.concat((mfcc_allo_wav2vec_hidden_state, ge2e_emb),1)
-          matrix_embedding = self.construct_matrix_embed(x,label,ge2e_emb.shape[0],4).to(DEVICE)
-          contrastive_loss,err = self.SpeakerEncoder.loss(matrix_embedding)
-          print("contrastive loss:",contrastive_loss,err)
+          print(bloy_embedding.shape,mfcc_allo_hidden_state.shape)
+          all_hidden_state = torch.add(bloy_embedding,mfcc_allo_wav2vec_hidden_state)
+          
+          
+          x = torch.concat((all_hidden_state, ge2e_emb),1)
           x = self.dense1_en(x)
           x = self.bn_en(x)
           m = nn.Mish()
           x = torch.tanh(x)
           x = self.dropout(x)
+          
           x = self.dense2_en(x)
           x = self.bn1_en(x)
           x = F.relu(x)
@@ -429,19 +566,25 @@ class SER_MODEL(nn.Module):
           x = self.dense3_en(x)
           x = self.bn2_en(x)
           x = F.gelu(x)
+          matrix_embedding = self.construct_matrix_embed(x,label,ge2e_emb.shape[0],6).to(DEVICE)
+          contrastive_loss,err = self.loss(matrix_embedding)
+          
           x = self.out_proj_en(x)
           loss_fct = torch.nn.CrossEntropyLoss()
           label = label.long()
           loss = loss_fct(x.view(-1, 4), label.view(-1))
-          alpha = 0.5
+          alpha = 0.1
           total_loss = loss+alpha*contrastive_loss
           return total_loss,x
+
         if lang == "ge":
-          
+          bloy_embedding = self.adaptor(bloy_embedding)
+          bloy_embedding = self.adaptor1(bloy_embedding)
+          '''
           feat_input = torch.stack([allo_hidden_state,mfcc_hidden_state,wav2vec_hidden_state])
           feat_output = self.self_attention_layer_feat(feat_input)
           allo_hidden_state,mfcc_hidden_state,wav2vec_hidden_state = feat_output[0],feat_output[1],feat_output[2]
-
+          '''
           score = self.W_ge(ge2e_emb)
           score = F.relu(score)
           score = self.W_ge_1(score)
@@ -450,19 +593,19 @@ class SER_MODEL(nn.Module):
           score = F.relu(score)
           score = self.W_ge_3(score)
           score = nn.Softmax(dim = 1)(score)
+          
           #np.save("/content/drive/MyDrive/Speech-Emotion-Recognition/allosaurus+CNN/SER_mmoe/ge.npy",score.cpu().detach().numpy())
           allo_hidden_state = torch.matmul(allo_hidden_state.T,torch.diag(score[:,0])).T
           mfcc_hidden_state = torch.matmul(mfcc_hidden_state.T,torch.diag(score[:,1])).T
           wav2vec_hidden_state = torch.matmul(wav2vec_hidden_state.T,torch.diag(score[:,2])).T
           ge2e_emb = torch.matmul(ge2e_emb.T,torch.diag(score[:,3])).T
           
+
+          
           mfcc_allo_hidden_state = torch.add(allo_hidden_state,mfcc_hidden_state)
           mfcc_allo_wav2vec_hidden_state = torch.add(mfcc_allo_hidden_state,wav2vec_hidden_state)
           
           x = torch.concat((mfcc_allo_wav2vec_hidden_state, ge2e_emb),1)
-          matrix_embedding = self.construct_matrix_embed(x,label,ge2e_emb.shape[0],6).to(DEVICE)
-          contrastive_loss,err = self.SpeakerEncoder.loss(matrix_embedding)
-          print("contrastive loss:",contrastive_loss,err)
           x = self.dense1_ge(x)
           x = self.bn_ge(x)
           x = torch.tanh(x)
@@ -470,14 +613,17 @@ class SER_MODEL(nn.Module):
           x = self.dense2_ge(x)
           x = self.bn1_ge(x)
           x = F.relu(x)
+        
           x = self.dropout(x)
           x = self.dense3_ge(x)
           x = self.bn2_ge(x)
           x = F.gelu(x)
+          matrix_embedding = self.construct_matrix_embed(x,label,ge2e_emb.shape[0],7).to(DEVICE)
+          contrastive_loss,err = self.SpeakerEncoder.loss(matrix_embedding)
           x = self.out_proj_ge(x)
           loss_fct = torch.nn.CrossEntropyLoss()
           label = label.long()
-          loss = loss_fct(x.view(-1, 6), label.view(-1))
-          alpha = 0.5
+          loss = loss_fct(x.view(-1, 7), label.view(-1))
+          alpha = 0.01
           total_loss = loss+alpha*contrastive_loss
           return total_loss,x

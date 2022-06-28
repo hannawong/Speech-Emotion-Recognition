@@ -27,8 +27,8 @@ class PretrainBatcher():
             if (self.position + line_idx) % self.nranks != self.rank:
                 continue
             line_split = line.strip().split(",")
-            audio_file = line_split[0]
-            label = cls_label_map[line_split[1]]
+            audio_file = line_split[1]
+            label = cls_label_map[line_split[2]]
             labels.append(label)
             audio_filenames.append(audio_file)
 

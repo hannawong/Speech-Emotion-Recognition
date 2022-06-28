@@ -53,8 +53,13 @@ def tensorize_triples(args,lang,audio_files, labels, bsize): ##transform sentenc
     print(lang)
     if lang == "fr":
         MAX_LEN_MFCC = 2000
+        MAX_LEN = 2000
+    if lang == "pe":
+        MAX_LEN_MFCC = 300
+        MAX_LEN = 300
     else:
         MAX_LEN_MFCC = 250
+        MAX_LEN = 250
     allo_embs = []
     length = []
     for file in audio_files:
@@ -79,9 +84,14 @@ def tensorize_triples(args,lang,audio_files, labels, bsize): ##transform sentenc
     WAV2VEC1_embs = []
     wav2vec1_length = []
     for file in audio_files:
-        ge2e_emb = np.load(open(GE2E_EMB_PATH+file.split("/")[-1][:-4]+".npy","rb"))
-        ge2e_emb = np.expand_dims(ge2e_emb,0)
-        ge2e_emb = torch.Tensor(ge2e_emb)
+        try:
+            ge2e_emb = np.load(open(GE2E_EMB_PATH+file.split("/")[-1][:-4]+".npy","rb"))
+            ge2e_emb = np.expand_dims(ge2e_emb,0)
+            ge2e_emb = torch.Tensor(ge2e_emb)
+        except:
+            ge2e_emb = torch.zeros((1,256))
+        if torch.isnan(ge2e_emb).any():
+            ge2e_emb = torch.zeros((1,256))
         GE2E_embs.append(ge2e_emb)
 
         b_emb = torch.load(BLOY_EMB_PATH+file.split("/")[-1][:-4]+".pt")
@@ -94,9 +104,12 @@ def tensorize_triples(args,lang,audio_files, labels, bsize): ##transform sentenc
             wav2vec1_emb = torch.load(WAV2VEC1_EMB_PATH+file.split("/")[-1][:-4]+".pt")#(1,512,xxxdepend on length)
         except:
             wav2vec1_emb = torch.zeros((1,512,250))
+        if torch.isnan(wav2vec1_emb).any():
+            wav2vec1_emb = torch.zeros((1,512,250))
 
         wav2vec1_emb = wav2vec1_emb.permute(0,2,1)#exchange dim1 and dim2
         wav2vec1_emb = wav2vec1_emb.squeeze()#(num_of_window,512)
+        
 
         
         if wav2vec1_emb.shape[0] >= MAX_LEN:
@@ -135,6 +148,7 @@ def tensorize_triples(args,lang,audio_files, labels, bsize): ##transform sentenc
             
         mfcc_embs.append(mfcc_emb)
     mfcc_embedding = torch.stack(mfcc_embs,axis = 0) ##len,emb_size
+
     #else:
         #mfcc_embedding = torch.zeros((1,MAX_LEN,24))################此处存疑################
     

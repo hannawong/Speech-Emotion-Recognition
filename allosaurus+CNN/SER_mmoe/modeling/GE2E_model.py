@@ -122,6 +122,8 @@ class SpeakerEncoder(nn.Module):
         ground_truth = np.repeat(np.arange(speakers_per_batch), utterances_per_speaker)
         target = torch.from_numpy(ground_truth).long().to(DEVICE)
         loss = self.loss_fn(sim_matrix, target).to(DEVICE)
+        print(loss,"&&&&&&&&&")
+    
         
         # EER (not backpropagated)
         with torch.no_grad():

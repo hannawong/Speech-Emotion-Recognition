@@ -12,20 +12,19 @@ from SER_mmoe.modeling.ser_model import SER_MODEL
 from SER_mmoe.utils.utils import print_message
 from SER_mmoe.training.utils import split_train_val_test_german,shuf_order
 from torch.optim.lr_scheduler import StepLR
+import copy
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print(DEVICE)
 LOG = open("log.txt",'w')
 
-langs = ["ge"]
+langs = ["pe"]
 
 def train(args):
 
     random.seed(12345)
     np.random.seed(12345)
     torch.manual_seed(12345)
-
-    ser_model = SER_MODEL(args,audio_maxlen=200,num_labels=-1)
 
     EN_TEST_PATH = "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_04M.test.csv"
     EN_VAL_PATH = "/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/_iemocap_04M.val.csv"
@@ -35,9 +34,11 @@ def train(args):
     PE_triples, PE_TEST_PATH, PE_VAL_PATH = split_train_val_test_german("/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/Speech-Emotion-Recognition/allosaurus+CNN/persian/total.csv")
     GE_triples, GE_TEST_PATH, GE_VAL_PATH = split_train_val_test_german("/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/Speech-Emotion-Recognition/allosaurus+CNN/emodb/total.csv")
     FR_triples, FR_TEST_PATH, FR_VAL_PATH = split_train_val_test_german("/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/Speech-Emotion-Recognition/allosaurus+CNN/french/total.csv")
+    EN_triples, EN_TEST_PATH, EN_VAL_PATH = split_train_val_test_german("/data/jiayu_xiao/project/wzh/Speech_Emotion_Recognition/Speech-Emotion-Recognition/allosaurus+CNN/iemocap/total.csv")
     best_model = None
     best_uacc = 0.0
     best_wacc = 0.0
+    ser_model = SER_MODEL(args,audio_maxlen=200,num_labels=-1)
     ser_model = ser_model.to(DEVICE)
 
     amp = MixedPrecisionManager(args.amp)
@@ -45,7 +46,7 @@ def train(args):
     ge2e_params = list(map(id, ser_model.SpeakerEncoder.parameters()))
     base_params = filter(lambda p: id(p) not in ge2e_params,ser_model.parameters())
 
-    optimizer = AdamW([{'params':base_params},{'params':ser_model.SpeakerEncoder.parameters(),'lr':args.lr*0.01}],lr = args.lr,weight_decay=1e-5)
+    optimizer = AdamW([{'params':base_params},{'params':ser_model.SpeakerEncoder.parameters(),'lr':args.lr*0.01/len(langs)}],lr = args.lr/len(langs),weight_decay=1e-5)
     scheduler = StepLR(optimizer, step_size=2000, gamma=0.5)
     optimizer.zero_grad()
 
@@ -96,13 +97,13 @@ def train(args):
     step = 0
     pe_uacc,pe_wacc,en_uacc,en_wacc,ge_uacc,ge_wacc,fr_uacc,fr_wacc = 0,0,0,0,0,0,0,0
     pe_uacc_test,pe_wacc_test,en_uacc_test,en_wacc_test,ge_uacc_test,ge_wacc_test,fr_uacc_test,fr_wacc_test = 0,0,0,0,0,0,0,0
-    for epoch in range(30):
+    for epoch in range(20):
         scheduler.step()
         print('Epoch:', epoch,'LR:', scheduler.get_lr())
         LOG.write("="*30+"epoch: "+str(epoch)+"="*30+">"+"\n")
         training(step)
         if "ge" in langs:
-            ge_uacc,ge_wacc = evaluate(args,ser_model,GE_VAL_PATH,6,"ge")
+            ge_uacc,ge_wacc = evaluate(args,ser_model,GE_VAL_PATH,7,"ge")
         if "pe" in langs:
             pe_uacc,pe_wacc = evaluate(args,ser_model,PE_VAL_PATH,6,"pe")
         if "en" in langs:
@@ -112,7 +113,7 @@ def train(args):
 
         print("best validation score now is ",best_uacc)
         if "ge" in langs:
-            ge_uacc_test,ge_wacc_test = evaluate(args,ser_model,GE_TEST_PATH,6,"ge")
+            ge_uacc_test,ge_wacc_test = evaluate(args,ser_model,GE_TEST_PATH,7,"ge")
         if "en" in langs:
             en_uacc_test,en_wacc_test = evaluate(args,ser_model,EN_TEST_PATH,4,"en")
         if "pe" in langs:
@@ -120,22 +121,26 @@ def train(args):
         if "fr" in langs:
             fr_uacc_test,fr_wacc_test = evaluate(args,ser_model,FR_TEST_PATH,7,"fr")
         print("On test set german",ge_uacc_test," ,",ge_wacc_test)
-        #print("On test set english",en_uacc_test," ,",en_wacc_test)
-        #print("On test set persian",pe_uacc_test," ,",pe_wacc_test)
-        #print("On test set french",fr_uacc_test," ,",fr_wacc_test)
-        if not best_model:
-            best_model = ser_model
-        else:
-            if ge_uacc+pe_uacc+en_uacc+fr_uacc >= best_uacc:
-                print("saving best model...")
-                best_uacc = ge_uacc+pe_uacc+en_uacc+fr_uacc
-                best_model = ser_model
+        print("On test set english",en_uacc_test," ,",en_wacc_test)
+        print("On test set persian",pe_uacc_test," ,",pe_wacc_test)
+        print("On test set french",fr_uacc_test," ,",fr_wacc_test)
+
+        if ge_uacc+pe_uacc+en_uacc+fr_uacc >= best_uacc:
+            print("saving best model...")
+            best_uacc = ge_uacc+pe_uacc+en_uacc+fr_uacc
+            torch.save(ser_model, 'ser.pt')
+
     
-    print("finish training, now test on testset")
-    evaluate(args,best_model,GE_TEST_PATH,6,"ge")
-    #evaluate(args,best_model,PE_TEST_PATH,6,"pe")
-    #evaluate(args,best_model,EN_TEST_PATH,4,"en")
-    #evaluate(args,best_model,FR_TEST_PATH,7,"fr")
+    print("****finish training, now test on testset*****")
+    best_model = torch.load('ser.pt')
+    if "ge" in langs:
+        evaluate(args,best_model,GE_TEST_PATH,7,"ge")
+    if "pe" in langs:
+        evaluate(args,best_model,PE_TEST_PATH,6,"pe")
+    if "en" in langs:
+        evaluate(args,best_model,EN_TEST_PATH,4,"en")
+    if "fr" in langs:
+        evaluate(args,best_model,FR_TEST_PATH,7,"fr")
 
 def evaluate(args,model,path,CLASS_NUM,langs):
     print("begin evaluate...",langs)

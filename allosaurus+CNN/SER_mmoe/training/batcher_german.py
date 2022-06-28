@@ -19,7 +19,7 @@ class PretrainBatcher_ge():
         return self
 
     def __next__(self):
-        cls_label_map = {"bored":0, "fear":1, "angry":2, "happy":3,"disgust":4,"sad":5}
+        cls_label_map = {"bored":0, "fear":1, "angry":2, "happy":3,"disgust":4,"sad":5,"neutral":6}
         audio_filenames = []
         labels = []
         line_idx = 0
