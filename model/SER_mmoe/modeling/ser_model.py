@@ -516,7 +516,7 @@ class SER_MODEL(nn.Module):
           loss_fct = torch.nn.CrossEntropyLoss()
           label = label.long()
           loss = loss_fct(x.view(-1, 4), label.view(-1))
-          alpha = 0.0
+          alpha = 0.1
           total_loss = loss+alpha*contrastive_loss
           return total_loss,x
 
