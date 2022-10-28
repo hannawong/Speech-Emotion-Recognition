@@ -27,5 +27,6 @@ Firstly, you need to change the paths in file `model/SER_mmoe/training/utils.py`
 The training process is very simple. Please run the following command:
 
 ```sh
+cd model/
 sh train.sh
 ```
