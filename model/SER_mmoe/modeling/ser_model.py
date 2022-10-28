@@ -7,7 +7,7 @@ from SER_mmoe.modeling.GE2E_model import SpeakerEncoder
 from SER_mmoe.modeling.audio import *
 from SER_mmoe.modeling.inference import *
 from SER_mmoe.modeling.DSBN import high_layers
-state_fpath = "/data/jiayu_xiao/project/wzh/CL/Speech-Emotion-Recognition/model/SER_mmoe/modeling/encoder.pt"
+state_fpath = "/data/zihan_wang/project/wzh/CL/Speech-Emotion-Recognition/model/SER_mmoe/modeling/encoder.pt"
 DEVICE = "cuda"
 
 
@@ -355,7 +355,7 @@ class SER_MODEL(nn.Module):
         if lang == "ge":
           ge2e_emb = []
           for i in range(len(audio_files)):
-            wav = preprocess_wav("/data/jiayu_xiao/IEMOCAP/path_to_wavs/"+audio_files[i].split("/")[-1])
+            wav = preprocess_wav("/data/zihan_wang/IEMOCAP/path_to_wavs/"+audio_files[i].split("/")[-1])
             emb = embed_utterance(wav,self.SpeakerEncoder.to(DEVICE))
             ge2e_emb.append(torch.Tensor(emb))
           ge2e_emb = torch.stack(ge2e_emb, axis = 0)
